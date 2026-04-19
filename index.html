@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="高鐸工程行">
+<title>高鐸工程行</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== SHARED ===== */
+:root {
+  --accent: #e8a020;
+  --accent2: #f0c060;
+  --green: #4caf82;
+  --red: #e05555;
+  --blue: #4a9eff;
+  --radius: 14px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidden; }
+.hidden { display:none !important; }
+
+/* ===== LOGIN SCREEN ===== */
+#screen-login {
+min-height:100vh;
+background: linear-gradient(160deg, #0d0f14 0%, #1a2030 60%, #0d1520 100%);
+display:flex; flex-direction:column; align-items:center; justify-content:center;
+padding:24px;
+}
+.login-logo { text-align:center; margin-bottom:48px; }
+.login-logo-zh { font-size:32px; font-weight:900; color:var(–accent); letter-spacing:4px; }
+.login-logo-en { font-size:12px; color:rgba(255,255,255,0.35); font-family:‘DM Mono’,monospace; letter-spacing:3px; margin-top:4px; }
+.login-logo-icon { font-size:48px; margin-bottom:12px; }
+.login-subtitle { font-size:14px; color:rgba(255,255,255,0.4); margin-top:8px; }
+
+.login-cards { display:flex; flex-direction:column; gap:14px; width:100%; max-width:360px; }
+.login-card {
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:var(–radius); padding:20px 24px;
+cursor:pointer; transition:all 0.2s; text-decoration:none;
+display:flex; align-items:center; gap:16px;
+}
+.login-card:hover, .login-card:active { background:rgba(232,160,32,0.12); border-color:rgba(232,160,32,0.4); transform:scale(1.01); }
+.login-card-icon { font-size:28px; width:48px; text-align:center; }
+.login-card-text {}
+.login-card-title { font-size:17px; font-weight:700; color:#fff; }
+.login-card-desc { font-size:12px; color:rgba(255,255,255,0.45); margin-top:3px; }
+.login-card-arrow { margin-left:auto; color:rgba(255,255,255,0.3); font-size:18px; }
+
+.admin-card { border-color:rgba(232,160,32,0.25); }
+.admin-card .login-card-title { color:var(–accent); }
+
+/* Admin password modal */
+.pw-overlay {
+position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999;
+display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.pw-box {
+background:#161a22; border:1px solid #2a3040; border-radius:var(–radius);
+padding:28px; width:100%; max-width:340px;
+}
+.pw-title { font-size:17px; font-weight:700; color:#fff; margin-bottom:6px; }
+.pw-subtitle { font-size:13px; color:#7a8399; margin-bottom:20px; }
+.pw-input {
+width:100%; padding:12px 14px; border-radius:10px;
+border:1.5px solid #2a3040; background:#1e2430; color:#fff;
+font-size:16px; font-family:‘DM Mono’,monospace; letter-spacing:4px;
+outline:none; margin-bottom:12px;
+}
+.pw-input:focus { border-color:var(–accent); }
+.pw-actions { display:flex; gap:10px; }
+.pw-btn {
+flex:1; padding:12px; border-radius:10px; border:none;
+font-size:14px; font-weight:700; font-family:‘Noto Sans TC’,sans-serif;
+cursor:pointer; transition:all 0.15s;
+}
+.pw-btn-confirm { background:var(–accent); color:#0d0f14; }
+.pw-btn-cancel { background:#2a3040; color:#7a8399; }
+.pw-error { font-size:12px; color:var(–red); margin-bottom:10px; display:none; }
+
+/* ===== ADMIN VIEW ===== */
+#screen-admin {
+background:#0d0f14; color:#e8eaf0; min-height:100vh; display:flex;
+}
+.adm-sidebar {
+width:200px; background:#161a22; border-right:1px solid #2a3040;
+display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100;
+}
+.adm-logo { padding:20px 16px; border-bottom:1px solid #2a3040; }
+.adm-logo-zh { font-size:16px; font-weight:900; color:var(–accent); letter-spacing:2px; }
+.adm-logo-sub { font-size:10px; color:#7a8399; font-family:‘DM Mono’,monospace; margin-top:2px; }
+.adm-nav { flex:1; padding:12px 10px; overflow-y:auto; }
+.adm-nav-label { font-size:10px; font-family:‘DM Mono’,monospace; color:#7a8399; letter-spacing:2px; padding:10px 8px 5px; text-transform:uppercase; }
+.adm-nav-item {
+display:flex; align-items:center; gap:9px; padding:9px 11px;
+border-radius:8px; cursor:pointer; font-size:13px; color:#7a8399;
+transition:all 0.15s; margin-bottom:2px;
+}
+.adm-nav-item:hover { background:#1e2430; color:#e8eaf0; }
+.adm-nav-item.active { background:rgba(232,160,32,0.12); color:var(–accent); }
+.adm-nav-icon { font-size:15px; width:18px; text-align:center; }
+.adm-footer {
+padding:14px; border-top:1px solid #2a3040; font-size:10px; color:#7a8399;
+font-family:‘DM Mono’,monospace;
+}
+.adm-footer a { color:var(–accent); cursor:pointer; text-decoration:none; }
+
+.adm-main { margin-left:200px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+.adm-topbar {
+padding:16px 28px; border-bottom:1px solid #2a3040; background:#161a22;
+display:flex; align-items:center; justify-content:space-between;
+position:sticky; top:0; z-index:50;
+}
+.adm-page-title { font-size:18px; font-weight:700; color:#e8eaf0; }
+.adm-page-title span { color:var(–accent); }
+.adm-date { font-family:‘DM Mono’,monospace; font-size:12px; color:#7a8399; background:#1e2430; padding:5px 11px; border-radius:6px; border:1px solid #2a3040; }
+
+.adm-content { padding:24px 28px; flex:1; }
+.adm-page { display:none; }
+.adm-page.active { display:block; }
+
+/* Cards */
+.card { background:#161a22; border:1px solid #2a3040; border-radius:var(–radius); padding:20px; margin-bottom:16px; }
+.card-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#7a8399; margin-bottom:14px; font-family:‘DM Mono’,monospace; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:16px; }
+.stat-card { background:#161a22; border:1px solid #2a3040; border-radius:var(–radius); padding:18px; position:relative; overflow:hidden; }
+.stat-card::before { content:’’; position:absolute; top:0; left:0; right:0; height:3px; background:var(–accent); }
+.stat-card.green::before { background:var(–green); }
+.stat-card.blue::before { background:var(–blue); }
+.stat-label { font-size:10px; color:#7a8399; font-family:‘DM Mono’,monospace; letter-spacing:1px; margin-bottom:7px; }
+.stat-value { font-size:26px; font-weight:900; font-family:‘DM Mono’,monospace; }
+.stat-value small { font-size:13px; font-weight:400; color:#7a8399; }
+.stat-sub { font-size:11px; color:#7a8399; margin-top:3px; }
+
+/* Table */
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; font-size:10px; font-family:‘DM Mono’,monospace; color:#7a8399; letter-spacing:1px; text-transform:uppercase; padding:9px 12px; border-bottom:1px solid #2a3040; }
+td { padding:11px 12px; font-size:13px; border-bottom:1px solid rgba(42,48,64,0.5); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* Badge */
+.badge { display:inline-block; padding:3px 9px; border-radius:100px; font-size:11px; font-weight:500; }
+.badge-green { background:rgba(76,175,130,0.15); color:var(–green); }
+.badge-amber { background:rgba(232,160,32,0.15); color:var(–accent); }
+.badge-red { background:rgba(224,85,85,0.15); color:var(–red); }
+.badge-blue { background:rgba(74,158,255,0.15); color:var(–blue); }
+
+/* Button */
+.btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; border:none; transition:all 0.15s; font-family:‘Noto Sans TC’,sans-serif; }
+.btn-primary { background:var(–accent); color:#0d0f14; }
+.btn-primary:hover { background:var(–accent2); }
+.btn-outline { background:transparent; color:#e8eaf0; border:1px solid #2a3040; }
+.btn-outline:hover { background:#1e2430; }
+.btn-danger { background:rgba(224,85,85,0.15); color:var(–red); border:1px solid rgba(224,85,85,0.3); }
+.btn-accent-outline { background:transparent; color:var(–accent); border:1px solid rgba(232,160,32,0.4); font-size:11px; padding:4px 10px; }
+
+/* Form */
+.form-row { display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap; }
+.form-group { display:flex; flex-direction:column; gap:5px; flex:1; min-width:130px; }
+label { font-size:11px; color:#7a8399; font-family:‘DM Mono’,monospace; }
+input, select, textarea { background:#1e2430; border:1px solid #2a3040; border-radius:8px; padding:8px 11px; color:#e8eaf0; font-size:13px; font-family:‘Noto Sans TC’,sans-serif; outline:none; transition:border-color 0.15s; width:100%; }
+input:focus, select:focus { border-color:var(–accent); }
+select option { background:#1e2430; }
+
+/* Clock widget */
+.clock-widget { background:linear-gradient(135deg,#161a22,#1e2430); border:1px solid #2a3040; border-radius:var(–radius); padding:24px; text-align:center; }
+.clock-time { font-size:44px; font-weight:900; font-family:‘DM Mono’,monospace; color:var(–accent); line-height:1; margin-bottom:4px; }
+.clock-date { font-size:13px; color:#7a8399; margin-bottom:18px; }
+.punch-btns { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+.punch-btn { padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:‘Noto Sans TC’,sans-serif; transition:all 0.15s; }
+.punch-in { background:var(–green); color:#0d0f14; }
+.punch-in:hover { opacity:0.85; }
+.punch-out { background:var(–red); color:#fff; }
+.punch-out:hover { opacity:0.85; }
+
+/* Salary result */
+.salary-result { background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(240,192,96,0.04)); border:1px solid rgba(232,160,32,0.3); border-radius:var(–radius); padding:18px 22px; margin-top:14px; }
+.salary-result-label { font-size:11px; color:#7a8399; font-family:‘DM Mono’,monospace; margin-bottom:5px; }
+.salary-result-value { font-size:32px; font-weight:900; color:var(–accent); font-family:‘DM Mono’,monospace; }
+.salary-breakdown { margin-top:12px; }
+.breakdown-item { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid #2a3040; }
+.breakdown-item:last-child { border-bottom:none; }
+.breakdown-label { color:#7a8399; }
+.breakdown-value { font-family:‘DM Mono’,monospace; font-weight:500; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay.show { display:flex; }
+.modal { background:#161a22; border:1px solid #2a3040; border-radius:16px; padding:24px; width:460px; max-width:100%; }
+.modal-title { font-size:15px; font-weight:700; color:#e8eaf0; margin-bottom:18px; }
+.modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+
+/* Flex utils */
+.flex-between { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.gap-actions { display:flex; gap:6px; }
+.text-mono { font-family:‘DM Mono’,monospace; }
+.text-accent { color:var(–accent); }
+.text-green { color:var(–green); }
+.text-red { color:var(–red); }
+.text-dim { color:#7a8399; }
+.mt-4 { margin-top:16px; }
+.divider { height:1px; background:#2a3040; margin:14px 0; }
+
+/* Notification */
+.notification { position:fixed; bottom:20px; right:20px; background:#1e2430; border:1px solid #2a3040; border-left:3px solid var(–green); border-radius:10px; padding:12px 16px; font-size:13px; z-index:999; transform:translateX(120%); transition:transform 0.3s ease; max-width:300px; color:#e8eaf0; }
+.notification.show { transform:translateX(0); }
+.notification.error { border-left-color:var(–red); }
+
+/* ===== EMPLOYEE VIEW ===== */
+#screen-employee {
+background:#f4f5f7; color:#1a1d24; min-height:100vh;
+}
+.emp-topbar {
+background:#fff; border-bottom:1px solid #e2e5eb; padding:14px 18px;
+display:flex; align-items:center; justify-content:space-between;
+position:sticky; top:0; z-index:50;
+}
+.emp-logo { font-size:16px; font-weight:900; color:var(–accent); }
+.emp-logo-sub { font-size:10px; color:#6b7280; }
+.emp-name-badge { font-size:12px; background:#fff7ed; color:var(–accent); padding:5px 12px; border-radius:20px; font-weight:600; cursor:pointer; border:1px solid rgba(232,160,32,0.3); }
+
+.emp-container { max-width:480px; margin:0 auto; padding:16px 14px 60px; }
+
+.emp-tabs { display:flex; background:#fff; border-radius:12px; padding:4px; margin-bottom:18px; border:1px solid #e2e5eb; gap:3px; }
+.emp-tab { flex:1; padding:9px 4px; text-align:center; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; color:#6b7280; transition:all 0.15s; }
+.emp-tab.active { background:var(–accent); color:#fff; }
+
+.emp-clock-card { background:linear-gradient(135deg,#1a1d24 0%,#2d3340 100%); border-radius:var(–radius); padding:24px; margin-bottom:14px; text-align:center; }
+.emp-clock-time { font-size:48px; font-weight:900; font-family:‘DM Mono’,monospace; color:#fff; line-height:1; letter-spacing:2px; }
+.emp-clock-date { font-size:13px; color:rgba(255,255,255,0.55); margin-top:5px; margin-bottom:20px; }
+.emp-punch-row { display:flex; gap:10px; }
+.emp-punch-btn { flex:1; padding:13px; border-radius:11px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:‘Noto Sans TC’,sans-serif; transition:all 0.15s; }
+.emp-punch-btn:active { transform:scale(0.97); }
+.emp-punch-in { background:#16a34a; color:#fff; }
+.emp-punch-out { background:#dc2626; color:#fff; }
+
+.emp-status-card { background:#fff; border-radius:var(–radius); border:1px solid #e2e5eb; padding:14px 18px; margin-bottom:14px; }
+.emp-status-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; }
+.emp-status-row+.emp-status-row { border-top:1px solid #f0f1f3; }
+.emp-status-key { font-size:13px; color:#6b7280; }
+.emp-status-val { font-size:13px; font-weight:600; font-family:‘DM Mono’,monospace; }
+.emp-status-val.g { color:#16a34a; }
+.emp-status-val.r { color:#dc2626; }
+.emp-status-val.a { color:var(–accent); }
+
+.emp-section-title { font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:9px; }
+
+.emp-record { background:#fff; border-radius:11px; border:1px solid #e2e5eb; padding:13px 15px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center; }
+.emp-record-date { font-size:13px; font-weight:600; }
+.emp-record-times { font-size:11px; color:#6b7280; font-family:‘DM Mono’,monospace; margin-top:2px; }
+.emp-record-hrs { font-size:15px; font-weight:700; font-family:‘DM Mono’,monospace; color:var(–accent); }
+.emp-record-lbl { font-size:10px; color:#6b7280; text-align:right; }
+
+.emp-salary-big { background:#fff; border-radius:var(–radius); border:2px solid var(–accent); padding:22px; margin-bottom:14px; text-align:center; }
+.emp-salary-big-lbl { font-size:11px; color:#6b7280; margin-bottom:5px; }
+.emp-salary-big-val { font-size:38px; font-weight:900; color:var(–accent); font-family:‘DM Mono’,monospace; }
+.emp-salary-big-month { font-size:12px; color:#6b7280; margin-top:4px; }
+
+.emp-bonus-item { background:#fff; border-radius:11px; border:1px solid #e2e5eb; padding:13px 15px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center; }
+.emp-bonus-name { font-size:13px; font-weight:600; }
+.emp-bonus-client { font-size:11px; color:#6b7280; margin-top:2px; }
+.emp-bonus-amt { font-size:17px; font-weight:900; color:#16a34a; font-family:‘DM Mono’,monospace; }
+.emp-bonus-pending { font-size:13px; font-weight:600; color:#6b7280; }
+
+.emp-month-row { display:flex; gap:9px; margin-bottom:14px; }
+.emp-month-input { flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e5eb; font-size:13px; font-family:‘Noto Sans TC’,sans-serif; background:#fff; color:#1a1d24; outline:none; }
+.emp-month-input:focus { border-color:var(–accent); }
+.emp-filter-btn { padding:10px 16px; border-radius:10px; background:var(–accent); color:#fff; border:none; font-size:13px; font-weight:600; font-family:‘Noto Sans TC’,sans-serif; cursor:pointer; }
+
+.emp-empty { text-align:center; padding:32px 16px; color:#6b7280; font-size:13px; }
+.emp-empty-icon { font-size:28px; margin-bottom:8px; }
+
+/* Toast */
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(80px); background:#1a1d24; color:#fff; padding:11px 22px; border-radius:100px; font-size:13px; font-weight:500; z-index:999; transition:transform 0.3s ease; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.t-error { background:#dc2626; }
+
+/* Responsive */
+@media(max-width:700px) {
+.adm-sidebar { width:56px; }
+.adm-nav-item span:not(.adm-nav-icon) { display:none; }
+.adm-nav-label { display:none; }
+.adm-logo-zh { display:none; }
+.adm-logo-sub { display:none; }
+.adm-main { margin-left:56px; }
+.adm-content { padding:16px; }
+.adm-topbar { padding:12px 16px; }
+.grid-3 { grid-template-columns:1fr; }
+.grid-2 { grid-template-columns:1fr; }
+}
+
+.half-pay-toggle { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#7a8399; }
+.half-pay-toggle input[type=checkbox] { width:16px; height:16px; accent-color:var(–accent); cursor:pointer; }
+.doc-items-row { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+.doc-items-row input { flex:1; }
+.doc-items-row input.qty { max-width:70px; }
+.doc-items-row input.price { max-width:100px; }
+.doc-items-row input.total { max-width:100px; background:#0d0f14 !important; }
+.doc-items-row .del-btn { background:transparent; border:none; color:var(–red); cursor:pointer; font-size:16px; padding:0 4px; flex-shrink:0; }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:#2a3040; border-radius:2px; }
+</style>
+
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+
+<div id="screen-login">
+  <div class="login-logo">
+    <div class="login-logo-icon">🚪</div>
+    <div class="login-logo-zh">高鐸工程行</div>
+    <div class="login-logo-en">GAODUO ENGINEERING · 統編 60965538</div>
+    <div class="login-subtitle">請輸入你的個人密碼登入</div>
+  </div>
+  <div style="width:100%;max-width:340px">
+    <div class="pw-box" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+      <div class="pw-title" style="color:#fff">🔐 登入</div>
+      <div class="pw-subtitle">每位使用者有專屬密碼</div>
+      <div class="pw-error" id="pw-error">密碼錯誤，請再試一次</div>
+      <input class="pw-input" type="password" id="pw-input" placeholder="輸入密碼" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="pw-actions">
+        <button class="pw-btn pw-btn-confirm" style="flex:1" onclick="doLogin()">登入 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN ==================== -->
+
+<div id="screen-admin" class="hidden">
+  <aside class="adm-sidebar">
+    <div class="adm-logo">
+      <div class="adm-logo-zh">高鐸工程行</div>
+      <div class="adm-logo-sub">ADMIN</div>
+    </div>
+    <nav class="adm-nav">
+      <div class="adm-nav-label">主要</div>
+      <div class="adm-nav-item active" onclick="admGoTo('dashboard',this)"><span class="adm-nav-icon">📊</span><span>總覽</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('attendance',this)"><span class="adm-nav-icon">🕐</span><span>打卡記錄</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('salary',this)"><span class="adm-nav-icon">💰</span><span>薪資計算</span></div>
+      <div class="adm-nav-label">業務</div>
+      <div class="adm-nav-item" onclick="admGoTo('orders',this)"><span class="adm-nav-icon">📋</span><span>案件管理</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('bonus',this)"><span class="adm-nav-icon">🎯</span><span>獎金總覽</span></div>
+      <div class="adm-nav-label">財務</div>
+      <div class="adm-nav-item" onclick="admGoTo('quotes',this)"><span class="adm-nav-icon">📄</span><span>報價單</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('invoices',this)"><span class="adm-nav-icon">💳</span><span>請款單</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('receivables',this)"><span class="adm-nav-icon">📊</span><span>應收帳款</span></div>
+      <div class="adm-nav-label">人員</div>
+      <div class="adm-nav-item" onclick="admGoTo('staff',this)"><span class="adm-nav-icon">👥</span><span>員工設定</span></div>
+    </nav>
+    <div class="adm-footer">
+      統編 <span style="color:var(--accent)">60965538</span><br>
+      <a onclick="logout()">← 登出</a>
+    </div>
+  </aside>
+  <main class="adm-main">
+    <div class="adm-topbar">
+      <div class="adm-page-title" id="adm-title">系統 <span>總覽</span></div>
+      <div class="adm-date" id="adm-date">--</div>
+    </div>
+    <div class="adm-content">
+
+```
+  <!-- Dashboard -->
+  <div class="adm-page active" id="adm-dashboard">
+    <div class="grid-3">
+      <div class="stat-card"><div class="stat-label">本月案件</div><div class="stat-value" id="d-orders">0 <small>件</small></div><div class="stat-sub">成交中</div></div>
+      <div class="stat-card green"><div class="stat-label">本月業績</div><div class="stat-value" id="d-revenue">$0</div><div class="stat-sub">已成交</div></div>
+      <div class="stat-card blue"><div class="stat-label">待發獎金</div><div class="stat-value" id="d-bonus">$0</div><div class="stat-sub">已確認</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">今日出勤</div><table><thead><tr><th>員工</th><th>上班</th><th>下班</th><th>狀態</th></tr></thead><tbody id="d-att"></tbody></table></div>
+      <div class="card"><div class="card-title">最近案件</div><table><thead><tr><th>案件</th><th>業務</th><th>金額</th><th>狀態</th></tr></thead><tbody id="d-orders-tb"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- Attendance -->
+  <div class="adm-page" id="adm-attendance">
+    <div style="display:flex;gap:16px;align-items:stretch;margin-bottom:16px">
+      <div class="clock-widget" style="width:280px;flex-shrink:0">
+        <div class="clock-time" id="adm-clock">00:00:00</div>
+        <div class="clock-date" id="adm-clock-date">--</div>
+        <select id="punch-staff" style="width:100%;margin-bottom:10px">
+          <option value="">選擇員工</option>
+        </select>
+        <div class="punch-btns">
+          <button class="punch-btn punch-in" onclick="admPunch('in')">▶ 上班</button>
+          <button class="punch-btn punch-out" onclick="admPunch('out')">■ 下班</button>
+        </div>
+      </div>
+      <div class="card" style="flex:1;margin-bottom:0">
+        <div class="flex-between">
+          <div class="card-title" style="margin-bottom:0">打卡記錄</div>
+          <div style="display:flex;gap:8px">
+            <input type="month" id="att-month" style="padding:5px 9px;font-size:12px">
+            <button class="btn btn-outline" style="font-size:11px" onclick="renderAttTable()">篩選</button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <table><thead><tr><th>員工</th><th>日期</th><th>上班</th><th>下班</th><th>時數</th></tr></thead><tbody id="att-table"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salary -->
+  <div class="adm-page" id="adm-salary">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">薪資計算</div>
+        <div class="form-row">
+          <div class="form-group"><label>員工</label><select id="sal-staff" onchange="prefillSalary()"><option value="">選擇員工</option></select></div>
+          <div class="form-group"><label>月份</label><input type="month" id="sal-month"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>薪資類型</label><select id="sal-type" onchange="toggleSalType()"><option value="monthly">固定月薪</option><option value="hourly">時薪制</option></select></div>
+          <div class="form-group"><label>月薪 / 時薪 (元)</label><input type="number" id="sal-base" oninput="calcSalary()"></div>
+        </div>
+        <div class="form-row hidden" id="sal-hours-row">
+          <div class="form-group"><label>工時 (小時)</label><input type="number" id="sal-hours" oninput="calcSalary()"></div>
+          <div class="form-group"><label>加班時數</label><input type="number" id="sal-ot" placeholder="0" oninput="calcSalary()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>獎金 (元)</label><input type="number" id="sal-bonus" placeholder="0" oninput="calcSalary()"></div>
+          <div class="form-group"><label>扣款 (元)</label><input type="number" id="sal-deduct" placeholder="0" oninput="calcSalary()"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcSalary()" style="width:100%">計算薪資</button>
+        <div class="salary-result hidden" id="salary-result">
+          <div class="salary-result-label">應付薪資</div>
+          <div class="salary-result-value" id="salary-total">$0</div>
+          <div class="salary-breakdown" id="salary-breakdown"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">薪資記錄</div>
+        <table><thead><tr><th>員工</th><th>月份</th><th>薪資</th><th>狀態</th></tr></thead><tbody id="salary-history"></tbody></table>
+        <div class="mt-4" style="text-align:center">
+          <button class="btn btn-primary" onclick="saveSalary()">💾 儲存本次計算</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div class="adm-page" id="adm-orders">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddOrder()">＋ 新增案件</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>案件名稱</th><th>客戶</th><th>業務</th><th>金額</th><th>成交日</th><th>狀態</th><th>業務獎金</th><th>操作</th></tr></thead><tbody id="orders-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Bonus -->
+  <div class="adm-page" id="adm-bonus">
+    <div class="card">
+      <div class="card-title">業務獎金總覽</div>
+      <table><thead><tr><th>業務</th><th>本月案件</th><th>已確認獎金</th><th>待確認件數</th></tr></thead><tbody id="bonus-overview"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Staff -->
+  <div class="adm-page" id="adm-staff">
+    <div class="flex-between"><div></div><button class="btn btn-primary" onclick="showAddStaff()">＋ 新增人員</button></div>
+    <div class="card">
+      <table><thead><tr><th>姓名</th><th>職位</th><th>類型</th><th>薪資</th><th>狀態</th><th>操作</th></tr></thead><tbody id="staff-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Quotes 報價單 -->
+  <div class="adm-page" id="adm-quotes">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddQuote()">＋ 新增報價單</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>單號</th><th>客戶</th><th>施工地點</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="quotes-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Invoices 請款單 -->
+  <div class="adm-page" id="adm-invoices">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddInvoice()">＋ 新增請款單</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>單號</th><th>聯絡人</th><th>施工地址</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>收款狀態</th><th>操作</th></tr></thead>
+      <tbody id="invoices-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Receivables 應收帳款 -->
+  <div class="adm-page" id="adm-receivables">
+    <div class="flex-between" style="margin-bottom:16px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="month" id="rec-month" style="padding:7px 11px;font-size:13px;background:#1e2430;border:1px solid #2a3040;border-radius:8px;color:#e8eaf0">
+        <button class="btn btn-outline" onclick="renderReceivables()">篩選</button>
+      </div>
+      <button class="btn btn-primary" onclick="showAddReceivable()">＋ 新增帳款</button>
+    </div>
+    <!-- Summary cards -->
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">本月未稅合計</div><div class="stat-value" id="rec-pretax">$0</div></div>
+      <div class="stat-card green"><div class="stat-label">本月含稅合計</div><div class="stat-value" id="rec-total">$0</div></div>
+      <div class="stat-card blue"><div class="stat-label">本月淨利</div><div class="stat-value" id="rec-profit">$0</div></div>
+    </div>
+    <div class="card">
+      <table><thead><tr>
+        <th>日期</th><th>客戶</th><th>施工地點</th><th>未稅金額</th><th>稅(5%)</th><th>含稅</th><th>成本</th><th>育正回扣</th><th>瑋峻回扣</th><th>淨利</th><th>操作</th>
+      </tr></thead><tbody id="rec-table"></tbody></table>
+    </div>
+  </div>
+
+</div>
+```
+
+  </main>
+</div>
+
+<!-- ==================== EMPLOYEE ==================== -->
+
+<div id="screen-employee" class="hidden">
+  <div class="emp-topbar">
+    <div>
+      <div class="emp-logo">高鐸工程行</div>
+      <div class="emp-logo-sub">員工自助系統</div>
+    </div>
+    <div class="emp-name-badge" id="emp-name-badge" onclick="changeIdentity()">選擇身份 ▾</div>
+  </div>
+  <div class="emp-container">
+    <!-- Identity selector (shown when no identity) -->
+    <div id="emp-id-selector" class="emp-status-card" style="margin-bottom:16px">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:10px;font-weight:500">👤 請選擇你的名字</div>
+      <select id="emp-identity" onchange="onEmpIdentity()" style="width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid #e2e5eb;font-size:15px;font-family:'Noto Sans TC',sans-serif;background:#f4f5f7;color:#1a1d24;outline:none;appearance:none;-webkit-appearance:none">
+        <option value="">— 請選擇 —</option>
+      </select>
+    </div>
+
+```
+<div class="emp-tabs">
+  <div class="emp-tab active" onclick="empSwitchTab('clock')">🕐 打卡</div>
+  <div class="emp-tab" onclick="empSwitchTab('salary')">💰 薪資</div>
+  <div class="emp-tab" onclick="empSwitchTab('bonus')">🎯 獎金</div>
+</div>
+
+<!-- Clock tab -->
+<div id="emp-tab-clock">
+  <div class="emp-clock-card">
+    <div class="emp-clock-time" id="emp-clock">00:00:00</div>
+    <div class="emp-clock-date" id="emp-date">--</div>
+    <div class="emp-punch-row">
+      <button class="emp-punch-btn emp-punch-in" onclick="empPunch('in')">▶ 上班打卡</button>
+      <button class="emp-punch-btn emp-punch-out" onclick="empPunch('out')">■ 下班打卡</button>
+    </div>
+  </div>
+  <div class="emp-status-card">
+    <div class="emp-status-row"><span class="emp-status-key">今日狀態</span><span class="emp-status-val" id="e-today-status">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">上班時間</span><span class="emp-status-val g" id="e-today-in">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">下班時間</span><span class="emp-status-val r" id="e-today-out">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">今日工時</span><span class="emp-status-val a" id="e-today-hrs">—</span></div>
+  </div>
+  <div class="emp-section-title">本月打卡記錄</div>
+  <div id="emp-att-list"><div class="emp-empty"><div class="emp-empty-icon">📋</div>選擇身份後顯示</div></div>
+</div>
+
+<!-- Salary tab -->
+<div id="emp-tab-salary" class="hidden">
+  <div class="emp-month-row">
+    <input type="month" class="emp-month-input" id="emp-sal-month">
+    <button class="emp-filter-btn" onclick="renderEmpSalary()">查詢</button>
+  </div>
+  <div class="emp-salary-big">
+    <div class="emp-salary-big-lbl">本月應領薪資</div>
+    <div class="emp-salary-big-val" id="e-sal-total">—</div>
+    <div class="emp-salary-big-month" id="e-sal-month-lbl">請選擇身份</div>
+  </div>
+  <div class="emp-section-title">薪資明細</div>
+  <div class="emp-status-card" id="e-sal-detail"><div class="emp-empty" style="padding:16px"><div class="emp-empty-icon">💡</div>選擇身份查看明細</div></div>
+</div>
+
+<!-- Bonus tab -->
+<div id="emp-tab-bonus" class="hidden">
+  <div class="emp-month-row">
+    <input type="month" class="emp-month-input" id="emp-bon-month">
+    <button class="emp-filter-btn" onclick="renderEmpBonus()">查詢</button>
+  </div>
+  <div class="emp-status-card" style="margin-bottom:14px">
+    <div class="emp-status-row"><span class="emp-status-key">本月成交案件</span><span class="emp-status-val a" id="e-bon-count">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">已確認獎金合計</span><span class="emp-status-val g" id="e-bon-total">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">待確認案件</span><span class="emp-status-val" id="e-bon-pending">—</span></div>
+  </div>
+  <div class="emp-section-title">案件獎金明細</div>
+  <div id="emp-bonus-list"><div class="emp-empty"><div class="emp-empty-icon">🎯</div>選擇身份查看獎金</div></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- Modals -->
+
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-title">📋 新增案件</div>
+    <div class="form-row">
+      <div class="form-group"><label>案件名稱</label><input type="text" id="ord-name" placeholder="例：XX大樓自動門安裝"></div>
+      <div class="form-group"><label>客戶名稱</label><input type="text" id="ord-client" placeholder="客戶姓名/公司"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>業務來源</label><select id="ord-sales"><option value="">直客（無業務）</option></select></div>
+      <div class="form-group"><label>案件金額 (元)</label><input type="number" id="ord-amount" placeholder="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>成交日期</label><input type="date" id="ord-date"></div>
+      <div class="form-group"><label>狀態</label><select id="ord-status"><option value="pending">洽談中</option><option value="won">已成交</option><option value="lost">未成交</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-order')">取消</button>
+      <button class="btn btn-primary" onclick="addOrder()">確認新增</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-staff">
+  <div class="modal">
+    <div class="modal-title" id="staff-modal-title">👤 新增人員</div>
+    <input type="hidden" id="stf-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>姓名</label><input type="text" id="stf-name"></div>
+      <div class="form-group"><label>職位</label><input type="text" id="stf-role" placeholder="例：安裝師傅"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>人員類型</label><select id="stf-type"><option value="fulltime">全職員工</option><option value="parttime">兼職業務</option></select></div>
+      <div class="form-group"><label>薪資類型</label><select id="stf-sal-type"><option value="monthly">固定月薪</option><option value="hourly">時薪制</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>底薪 / 時薪 (元)</label><input type="number" id="stf-base" placeholder="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-staff')">取消</button>
+      <button class="btn btn-primary" id="staff-modal-btn" onclick="saveStaff()">確認新增</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Modal -->
+
+<div class="modal-overlay" id="modal-quote">
+  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title" id="quote-modal-title">📄 新增報價單</div>
+    <input type="hidden" id="q-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>單號</label><input type="text" id="q-no" placeholder="例：Q2603001"></div>
+      <div class="form-group"><label>報價日期</label><input type="date" id="q-date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>聯絡人</label><input type="text" id="q-contact" placeholder="客戶姓名"></div>
+      <div class="form-group"><label>聯絡電話</label><input type="text" id="q-phone" placeholder="客戶電話"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>統一編號（客戶）</label><input type="text" id="q-taxid" placeholder="選填"></div>
+      <div class="form-group"><label>地址</label><input type="text" id="q-addr" placeholder="施工地址"></div>
+    </div>
+    <div class="card-title" style="margin-top:12px">項目明細</div>
+    <div id="q-items-container"></div>
+    <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="addDocItem('q')">＋ 新增項目</button>
+    <div class="form-row">
+      <div class="form-group"><label>備註1（預設：報價單有效期限60天）</label><input type="text" id="q-note1" value="報價單有效期限:60天"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>備註2（預設：月結30天）</label><input type="text" id="q-note2" value="付款方式:月結30天"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-quote')">取消</button>
+      <button class="btn btn-outline" onclick="previewDoc('quote')" style="color:var(--blue);border-color:var(--blue)">👁 預覽 / 列印</button>
+      <button class="btn btn-primary" id="quote-modal-btn" onclick="saveQuote()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+
+<div class="modal-overlay" id="modal-invoice">
+  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title" id="invoice-modal-title">💳 新增請款單</div>
+    <input type="hidden" id="i-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>單號</label><input type="text" id="i-no" placeholder="例：P2603001"></div>
+      <div class="form-group"><label>請款日期</label><input type="date" id="i-date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>聯絡人（客戶）</label><input type="text" id="i-contact" placeholder="客戶姓名"></div>
+      <div class="form-group"><label>施工地址</label><input type="text" id="i-addr" placeholder="施工地址"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>統一編號（客戶）</label><input type="text" id="i-taxid" placeholder="選填"></div>
+      <div class="form-group"><label>收款狀態</label>
+        <select id="i-status"><option value="pending">待收款</option><option value="partial">部分收款</option><option value="paid">已收款</option></select>
+      </div>
+    </div>
+    <div class="card-title" style="margin-top:12px">項目明細</div>
+    <div id="i-items-container"></div>
+    <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="addDocItem('i')">＋ 新增項目</button>
+    <div class="form-row">
+      <div class="form-group"><label>匯款帳號</label><input type="text" id="i-bank-no" placeholder="帳號"></div>
+      <div class="form-group"><label>銀行</label><input type="text" id="i-bank-name" placeholder="銀行名稱"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>戶名</label><input type="text" id="i-bank-holder" placeholder="戶名"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-invoice')">取消</button>
+      <button class="btn btn-outline" onclick="previewDoc('invoice')" style="color:var(--blue);border-color:var(--blue)">👁 預覽 / 列印</button>
+      <button class="btn btn-primary" id="invoice-modal-btn" onclick="saveInvoice()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Receivable Modal -->
+
+<div class="modal-overlay" id="modal-receivable">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title" id="rec-modal-title">📊 新增帳款</div>
+    <input type="hidden" id="rec-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>日期</label><input type="date" id="rec-date"></div>
+      <div class="form-group"><label>客戶名稱</label><input type="text" id="rec-client" placeholder="例：萬澄"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2"><label>施工地點</label><input type="text" id="rec-site" placeholder="施工地址"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>未稅金額</label><input type="number" id="rec-pretax-val" placeholder="0" oninput="calcRecAuto()"></div>
+      <div class="form-group"><label>成本</label><input type="number" id="rec-cost" placeholder="0" oninput="calcRecAuto()"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>林育正回扣</label><input type="number" id="rec-bonus-lyz" placeholder="0" oninput="calcRecAuto()"></div>
+      <div class="form-group"><label>高瑋峻回扣</label><input type="number" id="rec-bonus-gwj" placeholder="0" oninput="calcRecAuto()"></div>
+    </div>
+    <!-- Auto calc preview -->
+    <div style="background:#1e2430;border-radius:10px;padding:14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#7a8399">營業稅(5%)</span><span id="rec-auto-tax" style="font-family:DM Mono,monospace">$0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#7a8399">含稅金額</span><span id="rec-auto-total" style="font-family:DM Mono,monospace">$0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span style="color:var(--green)">淨利</span><span id="rec-auto-profit" style="font-family:DM Mono,monospace;color:var(--green)">$0</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-receivable')">取消</button>
+      <button class="btn btn-primary" onclick="saveReceivable()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Preview Modal (for print/PDF) -->
+
+<div class="modal-overlay" id="modal-doc-preview">
+  <div class="modal" style="max-width:700px;max-height:92vh;overflow-y:auto;background:#fff;color:#111">
+    <div id="doc-preview-content"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #e2e5eb">
+      <button class="btn" style="background:#e2e5eb;color:#333" onclick="closeModal('modal-doc-preview')">關閉</button>
+      <button class="btn btn-primary" id="pdf-download-btn" onclick="downloadDocPDF()">📥 下載 PDF</button>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== STATE ====================
+// ==================== 帳號設定 ====================
+const ACCOUNTS = {
+  admin:  { pw: '0000', role: 'admin',    name: '老闆' },
+  '1576': { pw: '1576', role: 'employee', staffId: 2, name: '林育正' },
+  '0816': { pw: '0816', role: 'employee', staffId: 1, name: '高瑋峻' },
+};
+// 登入：輸入密碼即可，系統自動對應身份
+
+// ── 打卡地點設定（200公尺內有效）──
+const PUNCH_LOCATIONS = [
+  { name: '公司', lat: 24.16178, lng: 120.68050 },   // 台中市北區崇德路一段121巷2-1號
+  { name: '廠房', lat: 24.23917, lng: 120.72019 },   // 24°14'21.0"N 120°43'12.7"E
+];
+const PUNCH_RADIUS_M = 200;
+
+function getDistanceM(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function getNearestLocation(lat, lng) {
+  let nearest = null, minDist = Infinity;
+  PUNCH_LOCATIONS.forEach(loc => {
+    const d = getDistanceM(lat, lng, loc.lat, loc.lng);
+    if (d < minDist) { minDist = d; nearest = loc; }
+  });
+  return { location: nearest, dist: Math.round(minDist) };
+}
+
+function loadState() {
+  try { const s = localStorage.getItem('gaoduo_state'); if(s) return JSON.parse(s); } catch(e){}
+  return {
+    staff: [
+      {id:1,name:'高瑋峻',role:'安裝師傅',type:'fulltime',salType:'monthly',base:35000,active:true},
+      {id:2,name:'林育正',role:'兼職業務',type:'parttime',salType:'monthly',base:0,active:true},
+    ],
+    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],
+  };
+}
+function saveState() { localStorage.setItem('gaoduo_state', JSON.stringify(state)); }
+let state = loadState();
+let nextStaffId = Math.max(...state.staff.map(s=>s.id),2)+1;
+let nextOrderId = Math.max(...(state.orders.map(o=>o.id)||[0]),0)+1;
+
+// ==================== LOGIN ====================
+function doLogin() {
+  const pw = document.getElementById('pw-input').value.trim();
+  const err = document.getElementById('pw-error');
+  // Find matching account
+  const account = Object.values(ACCOUNTS).find(a => a.pw === pw);
+  if (!account) {
+    err.style.display='block';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+    return;
+  }
+  err.style.display='none';
+  document.getElementById('pw-input').value='';
+  document.getElementById('screen-login').classList.add('hidden');
+  if (account.role === 'admin') {
+    document.getElementById('screen-admin').classList.remove('hidden');
+    initAdmin();
+  } else {
+    empStaffId = account.staffId;
+    document.getElementById('screen-employee').classList.remove('hidden');
+    initEmployee();
+  }
+}
+function logout() {
+  document.getElementById('screen-admin').classList.add('hidden');
+  document.getElementById('screen-employee').classList.add('hidden');
+  document.getElementById('screen-login').classList.remove('hidden');
+  empStaffId = null;
+  setTimeout(()=>document.getElementById('pw-input').focus(), 200);
+}
+
+// ==================== ADMIN ====================
+function initAdmin() {
+  updateAdmClock();
+  setInterval(updateAdmClock,1000);
+  const m = new Date().toISOString().slice(0,7);
+  document.getElementById('att-month').value=m;
+  document.getElementById('sal-month').value=m;
+  const recMonthEl=document.getElementById('rec-month'); if(recMonthEl) recMonthEl.value=m;
+  admRenderAll();
+}
+function updateAdmClock() {
+  const now=new Date();
+  const t=document.getElementById('adm-clock'); if(t) t.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
+  const d=document.getElementById('adm-clock-date'); if(d) d.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  const ad=document.getElementById('adm-date'); if(ad) ad.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
+}
+const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
+function admGoTo(page,el) {
+  document.querySelectorAll('.adm-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('adm-'+page).classList.add('active');
+  el?.classList.add('active');
+  const t=admTitles[page]||['',''];
+  document.getElementById('adm-title').innerHTML=t[0]+' <span>'+t[1]+'</span>';
+  admRenderAll();
+}
+function admRenderAll() {
+  state=loadState();
+  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables();
+}
+function admRenderDropdowns() {
+  ['punch-staff','sal-staff','ord-sales'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    el.innerHTML = id==='ord-sales'?'<option value="">直客（無業務）</option>':'<option value="">— 選擇 —</option>';
+    state.staff.filter(s=>s.active).forEach(s=>{ el.innerHTML+=`<option value="${s.id}">${s.name}（${s.role}）</option>`; });
+    el.value=cur;
+  });
+}
+function admRenderStaff() {
+  const tb=document.getElementById('staff-table'); if(!tb) return;
+  tb.innerHTML=state.staff.map(s=>`<tr>
+    <td><strong>${s.name}</strong></td><td>${s.role}</td>
+    <td><span class="badge ${s.type==='fulltime'?'badge-blue':'badge-amber'}">${s.type==='fulltime'?'全職':'兼職'}</span></td>
+    <td class="text-mono">${s.salType==='monthly'?fmoney(s.base)+'/月':fmoney(s.base)+'/時'}</td>
+    <td><span class="badge ${s.active?'badge-green':'badge-red'}">${s.active?'在職':'離職'}</span></td>
+    <td><div class="gap-actions">
+      <button class="btn btn-outline" style="font-size:11px;padding:4px 9px" onclick="editStaff(${s.id})">✏️ 編輯</button>
+      <button class="btn btn-outline" style="font-size:11px;padding:4px 9px" onclick="toggleStaff(${s.id})">${s.active?'停用':'啟用'}</button>
+    </div></td>
+  </tr>`).join('');
+}
+function admRenderAtt() {
+  const tb=document.getElementById('att-table'); if(!tb) return;
+  const month=document.getElementById('att-month')?.value||'';
+  const rows=state.attendance.filter(a=>!month||a.date.startsWith(month));
+  if(!rows.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#7a8399;padding:20px">尚無記錄</td></tr>';return;}
+  tb.innerHTML=[...rows].reverse().map(a=>{
+    const hrs=a.out?((new Date(a.out)-new Date(a.in))/3600000).toFixed(1):'—';
+    const name=state.staff.find(s=>s.id==a.staffId)?.name||'—';
+    const isGwj = a.staffId === 1;
+    const halfBtn = isGwj
+      ? `<button onclick="toggleHalfPay('${a.staffId}','${a.date}')" style="margin-left:8px;padding:2px 8px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;${a.halfPay?'background:rgba(232,160,32,0.2);color:#e8a020':'background:rgba(76,175,130,0.15);color:#4caf82'}">${a.halfPay?'半薪':'全薪'}</button>`
+      : '';
+    return `<tr><td>${name}${halfBtn}</td><td class="text-mono">${a.date}</td><td class="text-mono text-green">${a.inTime}</td><td class="text-mono text-red">${a.outTime||'—'}</td><td class="text-mono">${hrs!=='—'?hrs+' hr':'—'}</td></tr>`;
+  }).join('');
+}
+function renderAttTable(){admRenderAtt();}
+function toggleHalfPay(staffId, date){
+  const rec = state.attendance.find(a=>a.staffId==staffId && a.date===date);
+  if(!rec) return;
+  rec.halfPay = !rec.halfPay;
+  saveState(); admRenderAtt();
+  showNotif(rec.halfPay ? '已設為半薪' : '已設為全薪');
+}
+function admRenderOrders() {
+  const tb=document.getElementById('orders-table'); if(!tb) return;
+  if(!state.orders.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無案件</td></tr>';return;}
+  const statusMap={won:['badge-green','已成交'],pending:['badge-amber','洽談中'],lost:['badge-red','未成交']};
+  tb.innerHTML=[...state.orders].reverse().map(o=>{
+    const sales=state.staff.find(s=>s.id==o.salesId)?.name||'直客';
+    const [cls,lbl]=statusMap[o.status]||['badge-amber','洽談中'];
+    const bonusCell = o.status==='won' && o.salesId
+      ? (o.bonus!=null
+          ? `<span class="text-green text-mono" style="font-weight:700">${fmoney(o.bonus)}</span>`
+          : `<button class="btn btn-accent-outline" onclick="setBonusPrompt(${o.id})">設定獎金</button>`)
+      : '<span class="text-dim">—</span>';
+    return `<tr>
+      <td><strong>${o.name}</strong></td><td>${o.client}</td><td>${sales}</td>
+      <td class="text-mono text-accent">${fmoney(o.amount)}</td><td class="text-mono">${o.date}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td>${bonusCell}</td>
+      <td><button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteOrder(${o.id})">刪除</button></td>
+    </tr>`;
+  }).join('');
+}
+function admRenderDashboard() {
+  const won=state.orders.filter(o=>o.status==='won');
+  const rev=won.reduce((s,o)=>s+o.amount,0);
+  const bon=won.filter(o=>o.bonus!=null).reduce((s,o)=>s+o.bonus,0);
+  const el1=document.getElementById('d-orders'); if(el1) el1.innerHTML=`${state.orders.length} <small>件</small>`;
+  const el2=document.getElementById('d-revenue'); if(el2) el2.textContent=fmoney(rev);
+  const el3=document.getElementById('d-bonus'); if(el3) el3.textContent=fmoney(bon);
+  const today=new Date().toISOString().slice(0,10);
+  const todayAtt=state.attendance.filter(a=>a.date===today);
+  const tb=document.getElementById('d-att');
+  if(tb) tb.innerHTML=todayAtt.length?todayAtt.map(a=>{
+    const name=state.staff.find(s=>s.id==a.staffId)?.name||'—';
+    return `<tr><td>${name}</td><td class="text-mono text-green">${a.inTime}</td><td class="text-mono text-red">${a.outTime||'—'}</td><td><span class="badge ${a.out?'badge-green':'badge-amber'}">${a.out?'已下班':'上班中'}</span></td></tr>`;
+  }).join(''):'<tr><td colspan="4" style="color:#7a8399;font-size:12px;padding:12px">今日尚無打卡</td></tr>';
+  const tb2=document.getElementById('d-orders-tb');
+  const recent=[...state.orders].slice(-5).reverse();
+  if(tb2) tb2.innerHTML=recent.length?recent.map(o=>{
+    const name=state.staff.find(s=>s.id==o.salesId)?.name||'直客';
+    const lm={won:'badge-green',pending:'badge-amber',lost:'badge-red'};
+    const ll={won:'成交',pending:'洽談',lost:'未成交'};
+    return `<tr><td>${o.name}</td><td>${name}</td><td class="text-mono text-accent">${fmoney(o.amount)}</td><td><span class="badge ${lm[o.status]}">${ll[o.status]}</span></td></tr>`;
+  }).join(''):'<tr><td colspan="4" style="color:#7a8399;font-size:12px;padding:12px">尚無案件</td></tr>';
+}
+function admRenderBonusOverview() {
+  const tb=document.getElementById('bonus-overview'); if(!tb) return;
+  const won=state.orders.filter(o=>o.status==='won');
+  const salesStaff=state.staff.filter(s=>s.active && s.type==='parttime');
+  if(!salesStaff.length){tb.innerHTML='<tr><td colspan="4" style="color:#7a8399;padding:12px">尚無兼職業務</td></tr>';return;}
+  tb.innerHTML=salesStaff.map(s=>{
+    const myOrders=won.filter(o=>o.salesId==s.id);
+    const confirmed=myOrders.filter(o=>o.bonus!=null);
+    const pending=myOrders.filter(o=>o.bonus==null);
+    const totalBon=confirmed.reduce((a,o)=>a+o.bonus,0);
+    return `<tr><td>${s.name}</td><td class="text-mono">${myOrders.length} 件</td><td class="text-mono text-green">${fmoney(totalBon)}</td><td class="text-mono ${pending.length?'text-accent':''}">${pending.length} 件待確認</td></tr>`;
+  }).join('');
+}
+function admRenderSalaryHistory() {
+  const tb=document.getElementById('salary-history'); if(!tb) return;
+  if(!state.salaryHistory.length){tb.innerHTML='<tr><td colspan="4" style="color:#7a8399;padding:12px">尚無記錄</td></tr>';return;}
+  tb.innerHTML=state.salaryHistory.map(h=>`<tr><td>${h.name}</td><td class="text-mono">${h.month}</td><td class="text-mono text-accent">${fmoney(h.total)}</td><td><span class="badge badge-green">已儲存</span></td></tr>`).join('');
+}
+
+// Admin actions
+function admPunch(type) {
+  const staffId=parseInt(document.getElementById('punch-staff').value);
+  if(!staffId){showNotif('請先選擇員工',true);return;}
+  const now=new Date(); const date=now.toISOString().slice(0,10); const timeStr=now.toLocaleTimeString('zh-TW',{hour12:false});
+  if(type==='in'){
+    if(state.attendance.find(a=>a.staffId===staffId&&a.date===date)){showNotif('今日已打上班卡',true);return;}
+    state.attendance.push({staffId,date,in:now.toISOString(),inTime:timeStr,out:null,outTime:null,halfPay:false});
+    showNotif('✅ 上班打卡：'+timeStr);
+  } else {
+    const rec=state.attendance.find(a=>a.staffId===staffId&&a.date===date&&!a.out);
+    if(!rec){showNotif('找不到今日上班記錄',true);return;}
+    rec.out=now.toISOString(); rec.outTime=timeStr;
+    showNotif('✅ 下班打卡：'+timeStr);
+  }
+  saveState(); admRenderAll();
+}
+function calcSalary() {
+  const type=document.getElementById('sal-type').value;
+  const base=parseFloat(document.getElementById('sal-base').value)||0;
+  const bonus=parseFloat(document.getElementById('sal-bonus').value)||0;
+  const deduct=parseFloat(document.getElementById('sal-deduct').value)||0;
+  let basePay=0,breakdown=[];
+  if(type==='monthly'){basePay=base;breakdown.push(['底薪',base]);}
+  else{
+    const hrs=parseFloat(document.getElementById('sal-hours').value)||0;
+    const ot=parseFloat(document.getElementById('sal-ot').value)||0;
+    basePay=hrs*base+ot*base*1.34;
+    breakdown.push(['正常工時薪資',hrs*base]);
+    if(ot>0) breakdown.push(['加班費',ot*base*1.34]);
+  }
+  if(bonus) breakdown.push(['獎金',bonus]);
+  if(deduct) breakdown.push(['扣款',-deduct]);
+  const total=basePay+bonus-deduct;
+  document.getElementById('salary-result').classList.remove('hidden');
+  document.getElementById('salary-total').textContent=fmoney(total);
+  document.getElementById('salary-breakdown').innerHTML=breakdown.map(([k,v])=>
+    `<div class="breakdown-item"><span class="breakdown-label">${k}</span><span class="breakdown-value ${v<0?'text-red':''}">${v<0?'−':'+'}${fmoney(Math.abs(v))}</span></div>`
+  ).join('');
+}
+function toggleSalType(){document.getElementById('sal-hours-row').classList.toggle('hidden',document.getElementById('sal-type').value!=='hourly');}
+function prefillSalary(){
+  const s=state.staff.find(x=>x.id===parseInt(document.getElementById('sal-staff').value));
+  if(s){document.getElementById('sal-type').value=s.salType;document.getElementById('sal-base').value=s.base;toggleSalType();}
+}
+function saveSalary(){
+  const staffId=parseInt(document.getElementById('sal-staff').value);
+  const s=state.staff.find(x=>x.id===staffId);
+  const tv=document.getElementById('salary-total').textContent;
+  if(!s||tv==='$0'){showNotif('請先選擇員工並計算薪資',true);return;}
+  const month=document.getElementById('sal-month').value;
+  const total=parseInt(tv.replace(/[^0-9]/g,''));
+  state.salaryHistory.unshift({staffId,name:s.name,month,total});
+  saveState(); admRenderSalaryHistory(); showNotif('💾 已儲存薪資記錄');
+}
+function setBonusPrompt(orderId){
+  const o=state.orders.find(x=>x.id===orderId); if(!o) return;
+  const sales=state.staff.find(s=>s.id==o.salesId)?.name||'業務';
+  const val=prompt(`案件：${o.name}\n業務：${sales}\n\n請輸入此案獎金金額（元）：`,o.bonus||'');
+  if(val===null) return;
+  const amt=parseInt(val.replace(/[^0-9]/g,''));
+  if(isNaN(amt)||amt<0){showNotif('請輸入有效金額',true);return;}
+  o.bonus=amt; saveState(); admRenderAll(); showNotif('✅ 獎金已設定：'+fmoney(amt));
+}
+function showAddOrder(){
+  document.getElementById('ord-date').value=new Date().toISOString().slice(0,10);
+  admRenderDropdowns();
+  document.getElementById('modal-order').classList.add('show');
+}
+function addOrder(){
+  const name=document.getElementById('ord-name').value.trim();
+  if(!name){showNotif('請輸入案件名稱',true);return;}
+  state.orders.push({
+    id:nextOrderId++,name,client:document.getElementById('ord-client').value.trim(),
+    salesId:parseInt(document.getElementById('ord-sales').value)||null,
+    amount:parseFloat(document.getElementById('ord-amount').value)||0,
+    date:document.getElementById('ord-date').value,
+    status:document.getElementById('ord-status').value,
+    bonus:null,
+  });
+  closeModal('modal-order'); saveState(); admRenderAll(); showNotif('✅ 案件已新增');
+}
+function deleteOrder(id){
+  if(!confirm('確定刪除此案件？')) return;
+  state.orders=state.orders.filter(o=>o.id!==id); saveState(); admRenderAll();
+}
+function showAddStaff(){
+  document.getElementById('stf-edit-id').value='';
+  ['stf-name','stf-role','stf-base'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('stf-type').value='fulltime';
+  document.getElementById('stf-sal-type').value='monthly';
+  document.getElementById('staff-modal-title').textContent='👤 新增人員';
+  document.getElementById('staff-modal-btn').textContent='確認新增';
+  document.getElementById('modal-staff').classList.add('show');
+}
+function editStaff(id){
+  const s=state.staff.find(x=>x.id===id); if(!s) return;
+  document.getElementById('stf-edit-id').value=s.id;
+  document.getElementById('stf-name').value=s.name;
+  document.getElementById('stf-role').value=s.role;
+  document.getElementById('stf-type').value=s.type;
+  document.getElementById('stf-sal-type').value=s.salType;
+  document.getElementById('stf-base').value=s.base;
+  document.getElementById('staff-modal-title').textContent='✏️ 編輯人員';
+  document.getElementById('staff-modal-btn').textContent='儲存修改';
+  document.getElementById('modal-staff').classList.add('show');
+}
+function saveStaff(){
+  const name=document.getElementById('stf-name').value.trim();
+  if(!name){showNotif('請輸入姓名',true);return;}
+  const editId=parseInt(document.getElementById('stf-edit-id').value);
+  if(editId){
+    const s=state.staff.find(x=>x.id===editId);
+    if(s){s.name=name;s.role=document.getElementById('stf-role').value||'未設定';s.type=document.getElementById('stf-type').value;s.salType=document.getElementById('stf-sal-type').value;s.base=parseFloat(document.getElementById('stf-base').value)||0;}
+    closeModal('modal-staff'); saveState(); admRenderAll(); showNotif('✅ 員工資料已更新');
+  } else {
+    state.staff.push({id:nextStaffId++,name,role:document.getElementById('stf-role').value||'未設定',type:document.getElementById('stf-type').value,salType:document.getElementById('stf-sal-type').value,base:parseFloat(document.getElementById('stf-base').value)||0,active:true});
+    closeModal('modal-staff'); saveState(); admRenderAll(); showNotif('✅ 人員已新增');
+  }
+}
+function toggleStaff(id){const s=state.staff.find(x=>x.id===id);if(s){s.active=!s.active;saveState();admRenderAll();}}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('show');}));
+
+// ==================== EMPLOYEE ====================
+let empStaffId = null;
+function initEmployee() {
+  updateEmpClock(); setInterval(updateEmpClock,1000);
+  const m=new Date().toISOString().slice(0,7);
+  document.getElementById('emp-sal-month').value=m;
+  document.getElementById('emp-bon-month').value=m;
+  // Identity already set from login — show name badge and hide selector
+  const s=state.staff.find(x=>x.id===empStaffId);
+  if(s){
+    document.getElementById('emp-name-badge').textContent=s.name+' ▾';
+    document.getElementById('emp-id-selector').classList.add('hidden');
+  }
+  renderEmpClock(); renderEmpSalary(); renderEmpBonus();
+}
+function updateEmpClock(){
+  const now=new Date();
+  const c=document.getElementById('emp-clock'); if(c) c.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
+  const d=document.getElementById('emp-date'); if(d) d.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+}
+function renderEmpDropdown(){
+  state=loadState();
+  const sel=document.getElementById('emp-identity');
+  sel.innerHTML='<option value="">— 請選擇 —</option>';
+  state.staff.filter(s=>s.active).forEach(s=>{sel.innerHTML+=`<option value="${s.id}">${s.name}（${s.role}）</option>`;});
+  if(empStaffId) sel.value=empStaffId;
+}
+function onEmpIdentity(){
+  empStaffId=parseInt(document.getElementById('emp-identity').value)||null;
+  const s=state.staff.find(x=>x.id===empStaffId);
+  document.getElementById('emp-name-badge').textContent=(s?s.name+'（'+s.role+'）':'選擇身份')+' ▾';
+  document.getElementById('emp-id-selector').classList.add('hidden');
+  renderEmpClock(); renderEmpSalary(); renderEmpBonus();
+}
+function changeIdentity(){
+  if(confirm('確定要登出嗎？')) logout();
+}
+function empSwitchTab(tab){
+  ['clock','salary','bonus'].forEach(t=>{document.getElementById('emp-tab-'+t).classList.toggle('hidden',t!==tab);});
+  document.querySelectorAll('.emp-tab').forEach((el,i)=>{el.classList.toggle('active',['clock','salary','bonus'][i]===tab);});
+  if(tab==='salary') renderEmpSalary();
+  if(tab==='bonus') renderEmpBonus();
+}
+function empPunch(type){
+  if(!empStaffId){showToast('請先選擇你的名字',true);return;}
+  // Show locating indicator
+  const btn = type==='in'
+    ? document.querySelector('.emp-punch-in')
+    : document.querySelector('.emp-punch-out');
+  const origText = btn.textContent;
+  btn.textContent='📍 定位中...'; btn.disabled=true;
+
+  if(!navigator.geolocation){
+    btn.textContent=origText; btn.disabled=false;
+    showToast('此裝置不支援定位',true); return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      btn.textContent=origText; btn.disabled=false;
+      const { location, dist } = getNearestLocation(pos.coords.latitude, pos.coords.longitude);
+      if(dist > PUNCH_RADIUS_M){
+        showToast(`📍 距離最近地點「${location.name}」${dist} 公尺，超出打卡範圍（${PUNCH_RADIUS_M}公尺）`, true);
+        return;
+      }
+      state=loadState();
+      const now=new Date(); const date=now.toISOString().slice(0,10); const timeStr=now.toLocaleTimeString('zh-TW',{hour12:false});
+      if(type==='in'){
+        if(state.attendance.find(a=>a.staffId===empStaffId&&a.date===date)){showToast('今日已打上班卡',true);return;}
+        state.attendance.push({staffId:empStaffId,date,in:now.toISOString(),inTime:timeStr,out:null,outTime:null,halfPay:false,dist,locName:location.name});
+        showToast('✅ 上班打卡成功：'+timeStr+'（'+location.name+'・'+dist+'m）');
+      } else {
+        const rec=state.attendance.find(a=>a.staffId===empStaffId&&a.date===date&&!a.out);
+        if(!rec){showToast('找不到今日上班記錄',true);return;}
+        rec.out=now.toISOString(); rec.outTime=timeStr; rec.outDist=dist; rec.outLocName=location.name;
+        showToast('✅ 下班打卡成功：'+timeStr+'（'+location.name+'・'+dist+'m）');
+      }
+      saveState(); renderEmpClock();
+    },
+    (err) => {
+      btn.textContent=origText; btn.disabled=false;
+      const msgs={1:'請允許定位權限後再打卡',2:'無法取得位置，請確認GPS已開啟',3:'定位逾時，請重試'};
+      showToast('📍 '+(msgs[err.code]||'定位失敗'), true);
+    },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+  );
+}
+function renderEmpClock(){
+  state=loadState();
+  if(!empStaffId){document.getElementById('emp-att-list').innerHTML='<div class="emp-empty"><div class="emp-empty-icon">📋</div>選擇身份後顯示</div>';return;}
+  const today=new Date().toISOString().slice(0,10);
+  const rec=state.attendance.find(a=>a.staffId===empStaffId&&a.date===today);
+  document.getElementById('e-today-in').textContent=rec?.inTime||'—';
+  document.getElementById('e-today-out').textContent=rec?.outTime||'—';
+  if(rec?.out){
+    const hrs=((new Date(rec.out)-new Date(rec.in))/3600000).toFixed(1);
+    document.getElementById('e-today-hrs').textContent=hrs+' 小時';
+    document.getElementById('e-today-status').textContent='已下班';
+    document.getElementById('e-today-status').className='emp-status-val';
+  } else if(rec){
+    document.getElementById('e-today-hrs').textContent='上班中...';
+    document.getElementById('e-today-status').textContent='上班中';
+    document.getElementById('e-today-status').className='emp-status-val g';
+  } else {
+    document.getElementById('e-today-hrs').textContent='—';
+    document.getElementById('e-today-status').textContent='未打卡';
+    document.getElementById('e-today-status').className='emp-status-val r';
+  }
+  const month=new Date().toISOString().slice(0,7);
+  const myAtt=state.attendance.filter(a=>a.staffId===empStaffId&&a.date.startsWith(month));
+  const list=document.getElementById('emp-att-list');
+  list.innerHTML=myAtt.length?[...myAtt].reverse().map(a=>{
+    const hrs=a.out?((new Date(a.out)-new Date(a.in))/3600000).toFixed(1):null;
+    const halfTag = a.halfPay ? ' <span style="font-size:10px;background:rgba(232,160,32,0.2);color:#e8a020;padding:1px 6px;border-radius:4px">半薪</span>' : '';
+    const distTag = a.dist ? ` <span style="font-size:10px;color:#6b7280">${a.locName||''}・${a.dist}m</span>` : '';
+    return `<div class="emp-record"><div><div class="emp-record-date">${a.date}${halfTag}</div><div class="emp-record-times">上班 ${a.inTime} ／ 下班 ${a.outTime||'—'}${distTag}</div></div><div><div class="emp-record-hrs">${hrs?hrs+'hr':'上班中'}</div><div class="emp-record-lbl">工時</div></div></div>`;
+  }).join(''):'<div class="emp-empty"><div class="emp-empty-icon">📋</div>本月尚無打卡記錄</div>';
+}
+function renderEmpSalary(){
+  state=loadState();
+  if(!empStaffId){document.getElementById('e-sal-total').textContent='—';document.getElementById('e-sal-month-lbl').textContent='請選擇身份';document.getElementById('e-sal-detail').innerHTML='<div class="emp-empty" style="padding:16px"><div class="emp-empty-icon">💡</div>選擇身份查看明細</div>';return;}
+  const s=state.staff.find(x=>x.id===empStaffId); if(!s) return;
+  const month=document.getElementById('emp-sal-month').value;
+  const saved=state.salaryHistory.find(h=>h.staffId===empStaffId&&h.month===month);
+  const myAtt=state.attendance.filter(a=>a.staffId===empStaffId&&a.date.startsWith(month));
+  const totalHrs=myAtt.filter(a=>a.out).reduce((sum,a)=>sum+(new Date(a.out)-new Date(a.in))/3600000,0);
+  let rows=[],total=0;
+  if(saved){total=saved.total;rows=[['薪資（老闆已確認）',saved.total]];}
+  else if(s.salType==='monthly'){rows.push(['底薪（試算）',s.base]);total=s.base;}
+  else{const pay=Math.round(totalHrs*s.base);rows.push([`時薪 ${totalHrs.toFixed(1)}hr × $${s.base}（試算）`,pay]);total=pay;}
+  document.getElementById('e-sal-total').textContent='$'+total.toLocaleString('zh-TW');
+  document.getElementById('e-sal-month-lbl').textContent=month+(saved?'（老闆已確認）':'（試算，未經確認）');
+  document.getElementById('e-sal-detail').innerHTML=rows.map(([k,v])=>`<div class="emp-status-row"><span class="emp-status-key">${k}</span><span class="emp-status-val">$${Math.abs(v).toLocaleString('zh-TW')}</span></div>`).join('')+`<div class="emp-status-row"><span class="emp-status-key">本月出勤天數</span><span class="emp-status-val a">${myAtt.length} 天</span></div>`;
+}
+function renderEmpBonus(){
+  state=loadState();
+  if(!empStaffId){['e-bon-count','e-bon-total','e-bon-pending'].forEach(id=>{document.getElementById(id).textContent='—';});document.getElementById('emp-bonus-list').innerHTML='<div class="emp-empty"><div class="emp-empty-icon">🎯</div>選擇身份查看獎金</div>';return;}
+  const month=document.getElementById('emp-bon-month').value;
+  const myOrders=state.orders.filter(o=>o.salesId==empStaffId&&o.status==='won'&&(!month||o.date.startsWith(month)));
+  const confirmed=myOrders.filter(o=>o.bonus!=null);
+  const pending=myOrders.filter(o=>o.bonus==null);
+  const total=confirmed.reduce((s,o)=>s+o.bonus,0);
+  document.getElementById('e-bon-count').textContent=myOrders.length+' 件';
+  document.getElementById('e-bon-total').textContent='$'+total.toLocaleString('zh-TW');
+  document.getElementById('e-bon-pending').textContent=pending.length+' 件待老闆確認';
+  document.getElementById('emp-bonus-list').innerHTML=myOrders.length?myOrders.map(o=>`
+    <div class="emp-bonus-item">
+      <div><div class="emp-bonus-name">${o.name}</div><div class="emp-bonus-client">${o.client} ／ ${o.date}</div></div>
+      ${o.bonus!=null?`<div class="emp-bonus-amt">$${o.bonus.toLocaleString('zh-TW')}</div>`:`<div class="emp-bonus-pending">待確認</div>`}
+    </div>`).join(''):'<div class="emp-empty"><div class="emp-empty-icon">🎯</div>本月尚無成交案件</div>';
+}
+
+// ==================== QUOTES ====================
+let nextQuoteId=1, nextInvoiceId=1, nextRecId=1;
+
+function showAddQuote(){
+  document.getElementById('q-edit-id').value='';
+  document.getElementById('q-no').value='Q'+new Date().toISOString().slice(2,4)+new Date().toISOString().slice(5,7)+'001';
+  document.getElementById('q-date').value=new Date().toISOString().slice(0,10);
+  ['q-contact','q-phone','q-taxid','q-addr'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('q-note1').value='報價單有效期限:60天';
+  document.getElementById('q-note2').value='付款方式:月結30天';
+  document.getElementById('q-items-container').innerHTML='';
+  addDocItem('q'); addDocItem('q'); addDocItem('q');
+  document.getElementById('quote-modal-title').textContent='📄 新增報價單';
+  document.getElementById('modal-quote').classList.add('show');
+}
+function showAddInvoice(){
+  document.getElementById('i-edit-id').value='';
+  document.getElementById('i-no').value='P'+new Date().toISOString().slice(2,4)+new Date().toISOString().slice(5,7)+'001';
+  document.getElementById('i-date').value=new Date().toISOString().slice(0,10);
+  ['i-contact','i-addr','i-taxid','i-bank-no','i-bank-name','i-bank-holder'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('i-status').value='pending';
+  document.getElementById('i-items-container').innerHTML='';
+  addDocItem('i'); addDocItem('i'); addDocItem('i');
+  document.getElementById('invoice-modal-title').textContent='💳 新增請款單';
+  document.getElementById('modal-invoice').classList.add('show');
+}
+function addDocItem(prefix){
+  const cont=document.getElementById(prefix+'-items-container');
+  const idx=cont.children.length+1;
+  const div=document.createElement('div'); div.className='doc-items-row';
+  div.innerHTML=`<input type="text" placeholder="${idx}. 說明及規格" style="flex:3">
+    <input type="number" class="qty" placeholder="數量" oninput="calcDocRow(this)">
+    <input type="number" class="price" placeholder="單價" oninput="calcDocRow(this)">
+    <input type="number" class="total" placeholder="合計" readonly>
+    <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  cont.appendChild(div);
+}
+function calcDocRow(el){
+  const row=el.closest('.doc-items-row');
+  const qty=parseFloat(row.children[1].value)||0;
+  const price=parseFloat(row.children[2].value)||0;
+  row.children[3].value=qty*price||'';
+}
+function getDocItems(prefix){
+  const cont=document.getElementById(prefix+'-items-container');
+  return Array.from(cont.children).map(row=>({
+    desc:row.children[0].value.trim(),
+    qty:parseFloat(row.children[1].value)||0,
+    price:parseFloat(row.children[2].value)||0,
+    total:parseFloat(row.children[3].value)||0,
+  })).filter(r=>r.desc||r.total);
+}
+function calcDocTotal(items){
+  const pretax=items.reduce((s,r)=>s+r.total,0);
+  const tax=Math.round(pretax*0.05);
+  return {pretax,tax,total:pretax+tax};
+}
+function saveQuote(){
+  const no=document.getElementById('q-no').value.trim();
+  if(!no){showNotif('請輸入單號',true);return;}
+  const items=getDocItems('q');
+  const {pretax,tax,total}=calcDocTotal(items);
+  const rec={
+    id:document.getElementById('q-edit-id').value||nextQuoteId++,
+    no, date:document.getElementById('q-date').value,
+    contact:document.getElementById('q-contact').value,
+    phone:document.getElementById('q-phone').value,
+    taxid:document.getElementById('q-taxid').value,
+    addr:document.getElementById('q-addr').value,
+    note1:document.getElementById('q-note1').value,
+    note2:document.getElementById('q-note2').value,
+    items,pretax,tax,total,
+  };
+  const idx=state.quotes.findIndex(q=>q.id==rec.id);
+  if(idx>=0) state.quotes[idx]=rec; else state.quotes.push(rec);
+  saveState(); closeModal('modal-quote'); renderQuotes(); showNotif('✅ 報價單已儲存');
+}
+function saveInvoice(){
+  const no=document.getElementById('i-no').value.trim();
+  if(!no){showNotif('請輸入單號',true);return;}
+  const items=getDocItems('i');
+  const {pretax,tax,total}=calcDocTotal(items);
+  const rec={
+    id:document.getElementById('i-edit-id').value||nextInvoiceId++,
+    no, date:document.getElementById('i-date').value,
+    contact:document.getElementById('i-contact').value,
+    addr:document.getElementById('i-addr').value,
+    taxid:document.getElementById('i-taxid').value,
+    status:document.getElementById('i-status').value,
+    bankNo:document.getElementById('i-bank-no').value,
+    bankName:document.getElementById('i-bank-name').value,
+    bankHolder:document.getElementById('i-bank-holder').value,
+    items,pretax,tax,total,
+  };
+  const idx=state.invoices.findIndex(i=>i.id==rec.id);
+  if(idx>=0) state.invoices[idx]=rec; else state.invoices.push(rec);
+  saveState(); closeModal('modal-invoice'); renderInvoices(); showNotif('✅ 請款單已儲存');
+}
+function renderQuotes(){
+  const tb=document.getElementById('quotes-table'); if(!tb) return;
+  if(!state.quotes.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無報價單</td></tr>';return;}
+  tb.innerHTML=[...state.quotes].reverse().map(q=>`<tr>
+    <td class="text-mono text-accent">${q.no}</td>
+    <td>${q.contact}</td>
+    <td>${q.addr||'—'}</td>
+    <td class="text-mono">${fmoney(q.pretax)}</td>
+    <td class="text-mono text-green">${fmoney(q.total)}</td>
+    <td class="text-mono">${q.date}</td>
+    <td><span class="badge badge-amber">有效中</span></td>
+    <td><div class="gap-actions">
+      <button class="btn btn-outline" style="font-size:11px;padding:4px 9px;color:var(--blue);border-color:var(--blue)" onclick="previewDocById('quote',${q.id})">預覽/PDF</button>
+      <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteDoc('quote',${q.id})">刪除</button>
+    </div></td>
+  </tr>`).join('');
+}
+function renderInvoices(){
+  const tb=document.getElementById('invoices-table'); if(!tb) return;
+  if(!state.invoices.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無請款單</td></tr>';return;}
+  const sm={pending:['badge-amber','待收款'],partial:['badge-blue','部分收款'],paid:['badge-green','已收款']};
+  tb.innerHTML=[...state.invoices].reverse().map(i=>{
+    const [cls,lbl]=sm[i.status]||['badge-amber','待收款'];
+    return `<tr>
+      <td class="text-mono text-accent">${i.no}</td>
+      <td>${i.contact}</td>
+      <td>${i.addr||'—'}</td>
+      <td class="text-mono">${fmoney(i.pretax)}</td>
+      <td class="text-mono text-green">${fmoney(i.total)}</td>
+      <td class="text-mono">${i.date}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td><div class="gap-actions">
+        <button class="btn btn-outline" style="font-size:11px;padding:4px 9px;color:var(--blue);border-color:var(--blue)" onclick="previewDocById('invoice',${i.id})">預覽/PDF</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteDoc('invoice',${i.id})">刪除</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function deleteDoc(type,id){
+  if(!confirm('確定刪除？')) return;
+  if(type==='quote') state.quotes=state.quotes.filter(q=>q.id!=id);
+  else state.invoices=state.invoices.filter(i=>i.id!=id);
+  saveState(); renderQuotes(); renderInvoices(); showNotif('已刪除');
+}
+
+// ── Preview / Print ──
+function previewDoc(type){
+  const prefix=type==='quote'?'q':'i';
+  const items=getDocItems(prefix);
+  const {pretax,tax,total}=calcDocTotal(items);
+  const doc={
+    no:document.getElementById(prefix+'-no').value,
+    date:document.getElementById(prefix+'-date').value,
+    contact:document.getElementById(prefix+'-contact').value,
+    phone:type==='quote'?document.getElementById('q-phone').value:'',
+    taxid:document.getElementById(prefix+'-taxid').value,
+    addr:document.getElementById(prefix+'-addr').value,
+    note1:type==='quote'?document.getElementById('q-note1').value:'保固期:完工後一年',
+    note2:type==='quote'?document.getElementById('q-note2').value:'',
+    bankNo:type==='invoice'?document.getElementById('i-bank-no').value:'',
+    bankName:type==='invoice'?document.getElementById('i-bank-name').value:'',
+    bankHolder:type==='invoice'?document.getElementById('i-bank-holder').value:'',
+    items,pretax,tax,total,
+  };
+  showDocPreview(type,doc);
+}
+function previewDocById(type,id){
+  const doc=type==='quote'?state.quotes.find(q=>q.id==id):state.invoices.find(i=>i.id==id);
+  if(!doc) return;
+  showDocPreview(type,doc);
+}
+function showDocPreview(type,doc){
+  currentDocData = { type, doc };
+  const title=type==='quote'?'報價單':'請款單';
+  const rowsHtml=doc.items.map((r,i)=>`
+    <tr><td style="text-align:center">${i+1}</td><td>${r.desc}</td><td style="text-align:center">${r.qty||''}</td><td style="text-align:right">${r.price?r.price.toLocaleString():''}</td><td style="text-align:right">${r.total?r.total.toLocaleString():''}</td></tr>
+  `).join('');
+  // Pad to 10 rows
+  const empty=Math.max(0,8-doc.items.length);
+  const emptyRows=Array(empty).fill('<tr><td></td><td></td><td></td><td></td><td></td></tr>').join('');
+
+  const bankSection=type==='invoice'?`<div style="margin-top:20px;font-size:13px;line-height:2">
+    <strong>匯款資訊：</strong><br>
+    帳號：${doc.bankNo||'_______________'}　銀行：${doc.bankName||'_______________'}　戶名：${doc.bankHolder||'_______________'}
+  </div>`:'';
+
+  document.getElementById('doc-preview-content').innerHTML=`
+  <div style="font-family:'Noto Sans TC',sans-serif;padding:24px;color:#111;font-size:13px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+      <div>
+        <div style="font-size:22px;font-weight:900;color:#111">高鐸工程行</div>
+        <div style="font-size:16px;font-weight:700;margin-top:2px">${title}</div>
+      </div>
+      <div style="text-align:right;font-size:12px;line-height:1.8">
+        <div><strong>NO.</strong>${doc.no}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px">
+      <tr>
+        <td style="width:50%;padding:3px 0"><strong>聯絡人：</strong>${doc.contact||''}</td>
+        <td style="padding:3px 0"><strong>${title==='報價單'?'報價日期':'請款日期'}：</strong>${doc.date||''}</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 0"><strong>${type==='quote'?'聯絡電話：':'施工地址：'}</strong>${type==='quote'?doc.phone:doc.addr}</td>
+        <td style="padding:3px 0"><strong>聯絡電話：</strong>0985-929771</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 0"><strong>統一編號：</strong>${doc.taxid||''}</td>
+        <td style="padding:3px 0"><strong>統一編號：</strong>60965538</td>
+      </tr>
+      ${type==='quote'?`<tr><td style="padding:3px 0"><strong>地址：</strong>${doc.addr||''}</td><td style="padding:3px 0"><strong>地址：</strong>台中市北區崇德路一段121巷2-1號</td></tr>`:''}
+      <tr><td colspan="2" style="padding:3px 0;text-align:right"><strong>幣別：</strong>NTD</td></tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #ccc;margin-bottom:12px">
+      <thead>
+        <tr style="background:#f0f0f0">
+          <th style="border:1px solid #ccc;padding:6px;text-align:center;width:5%">項次</th>
+          <th style="border:1px solid #ccc;padding:6px;text-align:left">說明及規格</th>
+          <th style="border:1px solid #ccc;padding:6px;text-align:center;width:10%">數量</th>
+          <th style="border:1px solid #ccc;padding:6px;text-align:right;width:12%">單價</th>
+          <th style="border:1px solid #ccc;padding:6px;text-align:right;width:12%">合計</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}${emptyRows}
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:12px;line-height:2;flex:1">
+        <strong>備註：</strong><br>
+        ${doc.note1?'1. '+doc.note1+'<br>':''} 
+        ${doc.note2?'2. '+doc.note2+'<br>':''}
+        ${type==='invoice'?'3. 保固期:完工後一年':'3. 保固期:完工後一年<br>4. 需請水電拉電工自動門使用'}
+      </div>
+      <div style="width:200px;font-size:13px">
+        <table style="width:100%;border-collapse:collapse">
+          <tr><td style="padding:4px 8px;border:1px solid #ccc">合計</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.pretax.toLocaleString()}</td></tr>
+          <tr><td style="padding:4px 8px;border:1px solid #ccc">稅(5%)</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.tax.toLocaleString()}</td></tr>
+          <tr style="background:#f9f9f9;font-weight:700"><td style="padding:4px 8px;border:1px solid #ccc">總計</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.total.toLocaleString()}</td></tr>
+        </table>
+        <div style="margin-top:32px;border-top:1px solid #333;padding-top:4px;text-align:center;font-size:12px">客戶簽章</div>
+      </div>
+    </div>
+    ${bankSection}
+  </div>`;
+  document.getElementById('modal-doc-preview').classList.add('show');
+}
+
+// ── Receivables ──
+function showAddReceivable(){
+  document.getElementById('rec-edit-id').value='';
+  ['rec-date','rec-client','rec-site'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rec-date').value=new Date().toISOString().slice(0,10);
+  ['rec-pretax-val','rec-cost','rec-bonus-lyz','rec-bonus-gwj'].forEach(id=>document.getElementById(id).value='');
+  calcRecAuto();
+  document.getElementById('modal-receivable').classList.add('show');
+}
+function calcRecAuto(){
+  const pretax=parseFloat(document.getElementById('rec-pretax-val').value)||0;
+  const cost=parseFloat(document.getElementById('rec-cost').value)||0;
+  const lyz=parseFloat(document.getElementById('rec-bonus-lyz').value)||0;
+  const gwj=parseFloat(document.getElementById('rec-bonus-gwj').value)||0;
+  const tax=Math.round(pretax*0.05);
+  const profit=pretax-(cost+lyz+gwj);
+  document.getElementById('rec-auto-tax').textContent=fmoney(tax);
+  document.getElementById('rec-auto-total').textContent=fmoney(pretax+tax);
+  document.getElementById('rec-auto-profit').textContent=fmoney(profit);
+}
+function saveReceivable(){
+  const client=document.getElementById('rec-client').value.trim();
+  if(!client){showNotif('請輸入客戶名稱',true);return;}
+  const pretax=parseFloat(document.getElementById('rec-pretax-val').value)||0;
+  const cost=parseFloat(document.getElementById('rec-cost').value)||0;
+  const lyz=parseFloat(document.getElementById('rec-bonus-lyz').value)||0;
+  const gwj=parseFloat(document.getElementById('rec-bonus-gwj').value)||0;
+  const tax=Math.round(pretax*0.05);
+  const rec={
+    id:document.getElementById('rec-edit-id').value||nextRecId++,
+    date:document.getElementById('rec-date').value,
+    client,
+    site:document.getElementById('rec-site').value,
+    pretax,tax,total:pretax+tax,cost,lyz,gwj,
+    profit:pretax-(cost+lyz+gwj),
+  };
+  const idx=state.receivables.findIndex(r=>r.id==rec.id);
+  if(idx>=0) state.receivables[idx]=rec; else state.receivables.push(rec);
+  saveState(); closeModal('modal-receivable'); renderReceivables(); showNotif('✅ 帳款已儲存');
+}
+function renderReceivables(){
+  state=loadState();
+  const month=document.getElementById('rec-month')?.value||'';
+  const rows=state.receivables.filter(r=>!month||r.date.startsWith(month));
+  const tb=document.getElementById('rec-table'); if(!tb) return;
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" style="text-align:center;color:#7a8399;padding:20px">尚無帳款記錄</td></tr>';}
+  else tb.innerHTML=rows.map(r=>`<tr>
+    <td class="text-mono">${r.date}</td>
+    <td><strong>${r.client}</strong></td>
+    <td>${r.site||'—'}</td>
+    <td class="text-mono">${fmoney(r.pretax)}</td>
+    <td class="text-mono text-dim">${fmoney(r.tax)}</td>
+    <td class="text-mono text-accent">${fmoney(r.total)}</td>
+    <td class="text-mono">${r.cost?fmoney(r.cost):'—'}</td>
+    <td class="text-mono">${r.lyz?fmoney(r.lyz):'—'}</td>
+    <td class="text-mono">${r.gwj?fmoney(r.gwj):'—'}</td>
+    <td class="text-mono text-green" style="font-weight:700">${fmoney(r.profit)}</td>
+    <td><button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteRec(${r.id})">刪除</button></td>
+  </tr>`).join('');
+  // Summary
+  const sumPretax=rows.reduce((s,r)=>s+r.pretax,0);
+  const sumTotal=rows.reduce((s,r)=>s+r.total,0);
+  const sumProfit=rows.reduce((s,r)=>s+r.profit,0);
+  const p1=document.getElementById('rec-pretax'); if(p1) p1.textContent=fmoney(sumPretax);
+  const p2=document.getElementById('rec-total'); if(p2) p2.textContent=fmoney(sumTotal);
+  const p3=document.getElementById('rec-profit'); if(p3) p3.textContent=fmoney(sumProfit);
+}
+function deleteRec(id){
+  if(!confirm('確定刪除？')) return;
+  state.receivables=state.receivables.filter(r=>r.id!=id);
+  saveState(); renderReceivables();
+}
+
+// ==================== PDF EXPORT ====================
+let currentDocData = null; // store last previewed doc for PDF
+
+function downloadDocPDF() {
+  if (!currentDocData) { showNotif('請先預覽文件', true); return; }
+  const { type, doc } = currentDocData;
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const title = type === 'quote' ? '報價單' : '請款單';
+  const pageW = 210, margin = 15, contentW = pageW - margin * 2;
+  let y = 15;
+
+  // ── Header ──
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(18);
+  pdf.text('Gao Duo Engineering', margin, y);
+  pdf.setFontSize(11);
+  pdf.text('('+'高鐸工程行'+')', margin, y + 6);
+  pdf.setFontSize(14);
+  pdf.text(type === 'quote' ? 'Quotation' : 'Payment Request', margin, y + 14);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text('NO. ' + (doc.no || ''), pageW - margin, y, { align: 'right' });
+  y += 22;
+
+  // ── Info table ──
+  pdf.setFontSize(9.5);
+  const leftCol = [
+    [type === 'quote' ? 'Contact / 联絡人' : 'Contact / 联絡人', doc.contact || ''],
+    [type === 'quote' ? 'Tel / 電話' : 'Site / 施工地址', type === 'quote' ? (doc.phone || '') : (doc.addr || '')],
+    ['Tax ID / 統一編號', doc.taxid || ''],
+    [type === 'quote' ? 'Address / 地址' : '', type === 'quote' ? (doc.addr || '') : ''],
+  ].filter(r => r[0]);
+  const rightCol = [
+    [type === 'quote' ? 'Quote Date / 報價日期' : 'Date / 請款日期', doc.date || ''],
+    ['Tel / 電話', '0985-929771'],
+    ['Tax ID / 統一編號', '60965538'],
+    ['Address / 地址', 'Taichung, Taiwan'],
+  ];
+  const infoRows = Math.max(leftCol.length, rightCol.length);
+  for (let i = 0; i < infoRows; i++) {
+    const lk = leftCol[i]?.[0] || '', lv = leftCol[i]?.[1] || '';
+    const rk = rightCol[i]?.[0] || '', rv = rightCol[i]?.[1] || '';
+    pdf.setFont('helvetica', 'bold'); pdf.text(lk + ':', margin, y);
+    pdf.setFont('helvetica', 'normal'); pdf.text(lv, margin + 38, y);
+    pdf.setFont('helvetica', 'bold'); pdf.text(rk + ':', pageW / 2 + 2, y);
+    pdf.setFont('helvetica', 'normal'); pdf.text(rv, pageW / 2 + 35, y);
+    y += 5.5;
+  }
+  pdf.text('Currency / 幣別: NTD', pageW - margin, y, { align: 'right' });
+  y += 6;
+
+  // ── Items table ──
+  const tableBody = doc.items.map((r, i) => [
+    i + 1,
+    r.desc,
+    r.qty || '',
+    r.price ? r.price.toLocaleString() : '',
+    r.total ? r.total.toLocaleString() : '',
+  ]);
+  // Pad to at least 8 rows
+  while (tableBody.length < 8) tableBody.push(['', '', '', '', '']);
+
+  pdf.autoTable({
+    startY: y,
+    head: [['#', 'Description / 說明及規格', 'Qty', 'Unit Price', 'Total']],
+    body: tableBody,
+    theme: 'grid',
+    headStyles: { fillColor: [240,240,240], textColor: [0,0,0], fontStyle: 'bold', fontSize: 9 },
+    bodyStyles: { fontSize: 9, minCellHeight: 7 },
+    columnStyles: { 0:{cellWidth:10,halign:'center'}, 1:{cellWidth:90}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:30,halign:'right'}, 4:{cellWidth:30,halign:'right'} },
+    margin: { left: margin, right: margin },
+  });
+  y = pdf.lastAutoTable.finalY + 6;
+
+  // ── Totals + Notes side by side ──
+  const notesX = margin, totalsX = pageW - margin - 55;
+  pdf.setFontSize(9);
+  pdf.setFont('helvetica', 'bold'); pdf.text('Notes / 備註:', notesX, y);
+  pdf.setFont('helvetica', 'normal');
+  const notes = [];
+  if (doc.note1) notes.push('1. ' + doc.note1);
+  if (doc.note2) notes.push('2. ' + doc.note2);
+  notes.push((notes.length + 1) + '. 保固期:完工後一年');
+  if (type === 'quote') notes.push((notes.length + 1) + '. 需請水電拉電工自動門使用');
+  notes.forEach((n, i) => { pdf.text(n, notesX, y + 5 + i * 5); });
+
+  // Totals box
+  pdf.autoTable({
+    startY: y,
+    body: [
+      ['合計 / Subtotal', doc.pretax ? doc.pretax.toLocaleString() : '0'],
+      ['稅(5%) / Tax', doc.tax ? doc.tax.toLocaleString() : '0'],
+      ['總計 / Total', doc.total ? doc.total.toLocaleString() : '0'],
+    ],
+    theme: 'grid',
+    bodyStyles: { fontSize: 9.5 },
+    columnStyles: { 0:{cellWidth:28}, 1:{cellWidth:27,halign:'right'} },
+    margin: { left: totalsX, right: margin },
+    didParseCell: (data) => {
+      if (data.row.index === 2) { data.cell.styles.fontStyle = 'bold'; }
+    },
+  });
+
+  // Signature line
+  const sigY = pdf.lastAutoTable.finalY + 14;
+  pdf.setDrawColor(100);
+  pdf.line(totalsX, sigY, totalsX + 55, sigY);
+  pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
+  pdf.text('客戶簽章 / Customer Signature', totalsX + 27.5, sigY + 4, { align: 'center' });
+
+  // Bank info for invoice
+  if (type === 'invoice' && (doc.bankNo || doc.bankName || doc.bankHolder)) {
+    const bankY = Math.max(sigY + 10, y + notes.length * 5 + 12);
+    pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
+    pdf.text('Bank / 匠款資訊:', margin, bankY);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`帳號: ${doc.bankNo || ''}   銀行: ${doc.bankName || ''}   戶名: ${doc.bankHolder || ''}`, margin, bankY + 5);
+  }
+
+  // Save
+  const filename = (type === 'quote' ? 'Quote_' : 'Invoice_') + (doc.no || 'doc') + '.pdf';
+  pdf.save(filename);
+  showNotif('✅ PDF 已下載：' + filename);
+}
+
+// ==================== UTILS ====================
+function fmoney(n){return '$'+Math.round(n||0).toLocaleString('zh-TW');}
+function showNotif(msg,isError=false){
+  const el=document.getElementById('notification');
+  el.textContent=msg; el.className='notification show'+(isError?' error':'');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+function showToast(msg,isError=false){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show'+(isError?' t-error':'');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// Clock init for login screen
+setInterval(()=>{
+  const now=new Date();
+  const ac=document.getElementById('adm-clock'); if(ac) ac.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
+  const ec=document.getElementById('emp-clock'); if(ec) ec.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
+},1000);
+</script>
+
+</body>
+</html>
