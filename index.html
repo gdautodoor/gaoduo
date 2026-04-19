@@ -9,8 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="高鐸工程行">
 <title>高鐸工程行</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ===== SHARED ===== */
@@ -771,7 +770,7 @@ position:sticky; top:0; z-index:50;
     <div id="doc-preview-content"></div>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #e2e5eb">
       <button class="btn" style="background:#e2e5eb;color:#333" onclick="closeModal('modal-doc-preview')">關閉</button>
-      <button class="btn btn-primary" id="pdf-download-btn" onclick="downloadDocPDF()">📥 下載 PDF</button>
+      <button class="btn btn-primary" onclick="printDoc()">🖨️ 列印 / 儲存PDF</button>
     </div>
   </div>
 </div>
@@ -1593,133 +1592,137 @@ function deleteRec(id){
 }
 
 // ==================== PDF EXPORT ====================
-let currentDocData = null; // store last previewed doc for PDF
+let currentDocData = null;
 
-function downloadDocPDF() {
+function printDoc() {
   if (!currentDocData) { showNotif('請先預覽文件', true); return; }
   const { type, doc } = currentDocData;
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
   const title = type === 'quote' ? '報價單' : '請款單';
-  const pageW = 210, margin = 15, contentW = pageW - margin * 2;
-  let y = 15;
 
-  // ── Header ──
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(18);
-  pdf.text('Gao Duo Engineering', margin, y);
-  pdf.setFontSize(11);
-  pdf.text('('+'高鐸工程行'+')', margin, y + 6);
-  pdf.setFontSize(14);
-  pdf.text(type === 'quote' ? 'Quotation' : 'Payment Request', margin, y + 14);
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text('NO. ' + (doc.no || ''), pageW - margin, y, { align: 'right' });
-  y += 22;
+  const rowsHtml = doc.items.map((r, i) => `
+    <tr>
+      <td style="text-align:center;border:1px solid #ccc;padding:6px">${i+1}</td>
+      <td style="border:1px solid #ccc;padding:6px">${r.desc||''}</td>
+      <td style="text-align:center;border:1px solid #ccc;padding:6px">${r.qty||''}</td>
+      <td style="text-align:right;border:1px solid #ccc;padding:6px">${r.price?r.price.toLocaleString('zh-TW'):''}</td>
+      <td style="text-align:right;border:1px solid #ccc;padding:6px">${r.total?r.total.toLocaleString('zh-TW'):''}</td>
+    </tr>`).join('');
+  const emptyRows = Array(Math.max(0,8-doc.items.length)).fill(`<tr><td style="border:1px solid #ccc;padding:6px;height:28px"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>`).join('');
 
-  // ── Info table ──
-  pdf.setFontSize(9.5);
-  const leftCol = [
-    [type === 'quote' ? 'Contact / 联絡人' : 'Contact / 联絡人', doc.contact || ''],
-    [type === 'quote' ? 'Tel / 電話' : 'Site / 施工地址', type === 'quote' ? (doc.phone || '') : (doc.addr || '')],
-    ['Tax ID / 統一編號', doc.taxid || ''],
-    [type === 'quote' ? 'Address / 地址' : '', type === 'quote' ? (doc.addr || '') : ''],
-  ].filter(r => r[0]);
-  const rightCol = [
-    [type === 'quote' ? 'Quote Date / 報價日期' : 'Date / 請款日期', doc.date || ''],
-    ['Tel / 電話', '0985-929771'],
-    ['Tax ID / 統一編號', '60965538'],
-    ['Address / 地址', 'Taichung, Taiwan'],
-  ];
-  const infoRows = Math.max(leftCol.length, rightCol.length);
-  for (let i = 0; i < infoRows; i++) {
-    const lk = leftCol[i]?.[0] || '', lv = leftCol[i]?.[1] || '';
-    const rk = rightCol[i]?.[0] || '', rv = rightCol[i]?.[1] || '';
-    pdf.setFont('helvetica', 'bold'); pdf.text(lk + ':', margin, y);
-    pdf.setFont('helvetica', 'normal'); pdf.text(lv, margin + 38, y);
-    pdf.setFont('helvetica', 'bold'); pdf.text(rk + ':', pageW / 2 + 2, y);
-    pdf.setFont('helvetica', 'normal'); pdf.text(rv, pageW / 2 + 35, y);
-    y += 5.5;
+  const bankSection = type==='invoice' && (doc.bankNo||doc.bankName||doc.bankHolder) ? `
+    <div style="margin-top:16px;font-size:13px;border-top:1px solid #ccc;padding-top:10px">
+      <strong>匯款資訊：</strong>
+      帳號：${doc.bankNo||''}　銀行：${doc.bankName||''}　戶名：${doc.bankHolder||''}
+    </div>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>${title} ${doc.no||''}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans TC',sans-serif; font-size:13px; color:#111; padding:20px; max-width:800px; margin:0 auto; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+  .company-name { font-size:22px; font-weight:900; }
+  .doc-title { font-size:16px; font-weight:700; margin-top:4px; }
+  .doc-no { font-size:13px; text-align:right; }
+  .info-table { width:100%; border-collapse:collapse; margin-bottom:14px; font-size:12px; }
+  .info-table td { padding:3px 4px; vertical-align:top; }
+  .items-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
+  .items-table th { background:#f0f0f0; border:1px solid #ccc; padding:7px 8px; font-size:12px; }
+  .items-table td { border:1px solid #ccc; padding:6px 8px; font-size:12px; }
+  .totals-section { display:flex; justify-content:space-between; align-items:flex-start; }
+  .notes { font-size:12px; line-height:2; flex:1; padding-right:20px; }
+  .totals-table { width:200px; border-collapse:collapse; }
+  .totals-table td { border:1px solid #ccc; padding:5px 8px; font-size:13px; }
+  .totals-table .total-row td { font-weight:700; background:#f9f9f9; }
+  .sig-line { margin-top:32px; border-top:1px solid #333; padding-top:6px; text-align:center; font-size:12px; width:200px; }
+  @media print {
+    body { padding:10px; }
+    button { display:none !important; }
   }
-  pdf.text('Currency / 幣別: NTD', pageW - margin, y, { align: 'right' });
-  y += 6;
+</style>
 
-  // ── Items table ──
-  const tableBody = doc.items.map((r, i) => [
-    i + 1,
-    r.desc,
-    r.qty || '',
-    r.price ? r.price.toLocaleString() : '',
-    r.total ? r.total.toLocaleString() : '',
-  ]);
-  // Pad to at least 8 rows
-  while (tableBody.length < 8) tableBody.push(['', '', '', '', '']);
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="company-name">高鐸工程行</div>
+    <div class="doc-title">${title}</div>
+  </div>
+  <div class="doc-no"><strong>NO. ${doc.no||''}</strong></div>
+</div>
 
-  pdf.autoTable({
-    startY: y,
-    head: [['#', 'Description / 說明及規格', 'Qty', 'Unit Price', 'Total']],
-    body: tableBody,
-    theme: 'grid',
-    headStyles: { fillColor: [240,240,240], textColor: [0,0,0], fontStyle: 'bold', fontSize: 9 },
-    bodyStyles: { fontSize: 9, minCellHeight: 7 },
-    columnStyles: { 0:{cellWidth:10,halign:'center'}, 1:{cellWidth:90}, 2:{cellWidth:15,halign:'center'}, 3:{cellWidth:30,halign:'right'}, 4:{cellWidth:30,halign:'right'} },
-    margin: { left: margin, right: margin },
-  });
-  y = pdf.lastAutoTable.finalY + 6;
+<table class="info-table">
+  <tr>
+    <td width="50%"><strong>聯絡人：</strong>${doc.contact||''}</td>
+    <td><strong>${type==='quote'?'報價日期':'請款日期'}：</strong>${doc.date||''}</td>
+  </tr>
+  <tr>
+    <td><strong>${type==='quote'?'聯絡電話：':'施工地址：'}</strong>${type==='quote'?(doc.phone||''):(doc.addr||'')}</td>
+    <td><strong>聯絡電話：</strong>0985-929771</td>
+  </tr>
+  <tr>
+    <td><strong>統一編號：</strong>${doc.taxid||''}</td>
+    <td><strong>統一編號：</strong>60965538</td>
+  </tr>
+  ${type==='quote'?`<tr><td><strong>地址：</strong>${doc.addr||''}</td><td><strong>地址：</strong>台中市北區崇德路一段121巷2-1號</td></tr>`:''}
+  <tr><td colspan="2" style="text-align:right"><strong>幣別：</strong>NTD</td></tr>
+</table>
 
-  // ── Totals + Notes side by side ──
-  const notesX = margin, totalsX = pageW - margin - 55;
-  pdf.setFontSize(9);
-  pdf.setFont('helvetica', 'bold'); pdf.text('Notes / 備註:', notesX, y);
-  pdf.setFont('helvetica', 'normal');
-  const notes = [];
-  if (doc.note1) notes.push('1. ' + doc.note1);
-  if (doc.note2) notes.push('2. ' + doc.note2);
-  notes.push((notes.length + 1) + '. 保固期:完工後一年');
-  if (type === 'quote') notes.push((notes.length + 1) + '. 需請水電拉電工自動門使用');
-  notes.forEach((n, i) => { pdf.text(n, notesX, y + 5 + i * 5); });
+<table class="items-table">
+  <thead><tr>
+    <th style="width:5%;text-align:center">項次</th>
+    <th style="text-align:left">說明及規格</th>
+    <th style="width:10%;text-align:center">數量</th>
+    <th style="width:13%;text-align:right">單價</th>
+    <th style="width:13%;text-align:right">合計</th>
+  </tr></thead>
+  <tbody>${rowsHtml}${emptyRows}</tbody>
+</table>
 
-  // Totals box
-  pdf.autoTable({
-    startY: y,
-    body: [
-      ['合計 / Subtotal', doc.pretax ? doc.pretax.toLocaleString() : '0'],
-      ['稅(5%) / Tax', doc.tax ? doc.tax.toLocaleString() : '0'],
-      ['總計 / Total', doc.total ? doc.total.toLocaleString() : '0'],
-    ],
-    theme: 'grid',
-    bodyStyles: { fontSize: 9.5 },
-    columnStyles: { 0:{cellWidth:28}, 1:{cellWidth:27,halign:'right'} },
-    margin: { left: totalsX, right: margin },
-    didParseCell: (data) => {
-      if (data.row.index === 2) { data.cell.styles.fontStyle = 'bold'; }
-    },
-  });
+<div class="totals-section">
+  <div class="notes">
+    <strong>備註：</strong><br>
+    ${doc.note1?'1. '+doc.note1+'<br>':''}
+    ${doc.note2?'2. '+doc.note2+'<br>':''}
+    3. 保固期:完工後一年<br>
+    ${type==='quote'?'4. 需請水電拉電工自動門使用':''}
+  </div>
+  <div>
+    <table class="totals-table">
+      <tr><td>合計</td><td style="text-align:right">${(doc.pretax||0).toLocaleString('zh-TW')}</td></tr>
+      <tr><td>稅(5%)</td><td style="text-align:right">${(doc.tax||0).toLocaleString('zh-TW')}</td></tr>
+      <tr class="total-row"><td>總計</td><td style="text-align:right">${(doc.total||0).toLocaleString('zh-TW')}</td></tr>
+    </table>
+    <div class="sig-line">客戶簽章</div>
+  </div>
+</div>
+${bankSection}
 
-  // Signature line
-  const sigY = pdf.lastAutoTable.finalY + 14;
-  pdf.setDrawColor(100);
-  pdf.line(totalsX, sigY, totalsX + 55, sigY);
-  pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
-  pdf.text('客戶簽章 / Customer Signature', totalsX + 27.5, sigY + 4, { align: 'center' });
-
-  // Bank info for invoice
-  if (type === 'invoice' && (doc.bankNo || doc.bankName || doc.bankHolder)) {
-    const bankY = Math.max(sigY + 10, y + notes.length * 5 + 12);
-    pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
-    pdf.text('Bank / 匠款資訊:', margin, bankY);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`帳號: ${doc.bankNo || ''}   銀行: ${doc.bankName || ''}   戶名: ${doc.bankHolder || ''}`, margin, bankY + 5);
+<script>
+  window.onload = function() {
+    // Auto prompt print on mobile
+    setTimeout(function(){ window.print(); }, 800);
   }
+<\/script>
+</body></html>`;
 
-  // Save
-  const filename = (type === 'quote' ? 'Quote_' : 'Invoice_') + (doc.no || 'doc') + '.pdf';
-  pdf.save(filename);
-  showNotif('✅ PDF 已下載：' + filename);
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    // Fallback: download as html
+    const a = document.createElement('a');
+    a.href = url; a.download = title+'_'+( doc.no||'doc')+'.html';
+    a.click();
+  }
 }
 
-// ==================== UTILS ====================
+// ==================== UTILS ====================// ==================== UTILS ====================
 function fmoney(n){return '$'+Math.round(n||0).toLocaleString('zh-TW');}
 function showNotif(msg,isError=false){
   const el=document.getElementById('notification');
