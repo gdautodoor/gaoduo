@@ -360,6 +360,7 @@ position:sticky; top:0; z-index:50;
       <div class="adm-nav-item" onclick="admGoTo('receivables',this)"><span class="adm-nav-icon">📊</span><span>應收帳款</span></div>
       <div class="adm-nav-label">人員</div>
       <div class="adm-nav-item" onclick="admGoTo('staff',this)"><span class="adm-nav-icon">👥</span><span>員工設定</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('customers',this)"><span class="adm-nav-icon">🏢</span><span>客戶名單</span></div>
     </nav>
     <div class="adm-footer">
       統編 <span style="color:var(--accent)">60965538</span><br>
@@ -477,6 +478,18 @@ position:sticky; top:0; z-index:50;
     <div class="flex-between"><div></div><button class="btn btn-primary" onclick="showAddStaff()">＋ 新增人員</button></div>
     <div class="card">
       <table><thead><tr><th>姓名</th><th>職位</th><th>類型</th><th>薪資</th><th>狀態</th><th>操作</th></tr></thead><tbody id="staff-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Customers 客戶名單 -->
+  <div class="adm-page" id="adm-customers">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddCustomer()">＋ 新增客戶</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>客戶名稱</th><th>聯絡人</th><th>聯絡電話</th><th>統一編號</th><th>操作</th></tr></thead>
+      <tbody id="customers-table"></tbody></table>
     </div>
   </div>
 
@@ -686,11 +699,18 @@ position:sticky; top:0; z-index:50;
       <div class="form-group"><label>報價日期</label><input type="date" id="q-date"></div>
     </div>
     <div class="form-row">
+      <div class="form-group"><label>客戶</label>
+        <select id="q-customer" onchange="fillDocCustomer('q')">
+          <option value="">— 選擇客戶（或手動輸入）—</option>
+        </select>
+      </div>
       <div class="form-group"><label>聯絡人</label><input type="text" id="q-contact" placeholder="客戶姓名"></div>
-      <div class="form-group"><label>聯絡電話</label><input type="text" id="q-phone" placeholder="客戶電話"></div>
     </div>
     <div class="form-row">
+      <div class="form-group"><label>聯絡電話</label><input type="text" id="q-phone" placeholder="客戶電話"></div>
       <div class="form-group"><label>統一編號（客戶）</label><input type="text" id="q-taxid" placeholder="選填"></div>
+    </div>
+    <div class="form-row">
       <div class="form-group"><label>地址</label><input type="text" id="q-addr" placeholder="施工地址"></div>
     </div>
     <div class="card-title" style="margin-top:12px">項目明細</div>
@@ -721,7 +741,14 @@ position:sticky; top:0; z-index:50;
       <div class="form-group"><label>請款日期</label><input type="date" id="i-date"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>聯絡人（客戶）</label><input type="text" id="i-contact" placeholder="客戶姓名"></div>
+      <div class="form-group"><label>客戶</label>
+        <select id="i-customer" onchange="fillDocCustomer('i')">
+          <option value="">— 選擇客戶（或手動輸入）—</option>
+        </select>
+      </div>
+      <div class="form-group"><label>聯絡人</label><input type="text" id="i-contact" placeholder="客戶姓名"></div>
+    </div>
+    <div class="form-row">
       <div class="form-group"><label>施工地址</label><input type="text" id="i-addr" placeholder="施工地址"></div>
     </div>
     <div class="form-row">
@@ -790,6 +817,30 @@ position:sticky; top:0; z-index:50;
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #e2e5eb">
       <button class="btn" style="background:#e2e5eb;color:#333" onclick="closeModal('modal-doc-preview')">關閉</button>
       <button class="btn btn-primary" onclick="printDoc()">🖨️ 列印 / 儲存PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+
+<div class="modal-overlay" id="modal-customer">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title" id="cust-modal-title">🏢 新增客戶</div>
+    <input type="hidden" id="cust-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>客戶名稱（公司/姓名）</label><input type="text" id="cust-name" placeholder="例：萬澄"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>聯絡人</label><input type="text" id="cust-contact" placeholder="聯絡人姓名"></div>
+      <div class="form-group"><label>聯絡電話</label><input type="text" id="cust-phone" placeholder="0912-345-678"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>統一編號（選填）</label><input type="text" id="cust-taxid" placeholder=""></div>
+      <div class="form-group"><label>地址（選填）</label><input type="text" id="cust-addr" placeholder=""></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-customer')">取消</button>
+      <button class="btn btn-primary" id="cust-modal-btn" onclick="saveCustomer()">確認新增</button>
     </div>
   </div>
 </div>
@@ -872,7 +923,7 @@ function loadState() {
       {id:1,name:'高瑋峻',role:'安裝師傅',type:'fulltime',salType:'monthly',base:35000,active:true},
       {id:2,name:'林育正',role:'兼職業務',type:'parttime',salType:'monthly',base:0,active:true},
     ],
-    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],leaves:[],
+    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],leaves:[],customers:[],
   };
 }
 function saveState() { localStorage.setItem('gaoduo_state', JSON.stringify(state)); }
@@ -928,7 +979,7 @@ function updateAdmClock() {
   const d=document.getElementById('adm-clock-date'); if(d) d.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
   const ad=document.getElementById('adm-date'); if(ad) ad.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
 }
-const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],leaves:['請假','管理'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
+const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],leaves:['請假','管理'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],customers:['客戶','名單'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
 function admGoTo(page,el) {
   document.querySelectorAll('.adm-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.remove('active'));
@@ -940,7 +991,7 @@ function admGoTo(page,el) {
 }
 function admRenderAll() {
   state=loadState();
-  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables(); admRenderLeaves();
+  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables(); admRenderLeaves(); renderCustomers(); refreshCustomerDropdowns();
 }
 function admRenderDropdowns() {
   ['punch-staff','sal-staff','ord-sales'].forEach(id=>{
@@ -1403,11 +1454,28 @@ function renderEmpBonus(){
 // ==================== QUOTES ====================
 let nextQuoteId=1, nextInvoiceId=1, nextRecId=1;
 
+function genNextNo(prefix){
+  const now=new Date();
+  const yy=String(now.getFullYear()).slice(2);
+  const mm=String(now.getMonth()+1).padStart(2,'0');
+  const yearMonth=yy+mm;
+  // Find max serial for this year+month
+  const existing = prefix==='Q' ? state.quotes : state.invoices;
+  const pattern = new RegExp('^'+prefix+yearMonth+'(\\d+)$');
+  let maxSeq=0;
+  existing.forEach(d=>{
+    const m=d.no?.match(pattern);
+    if(m) maxSeq=Math.max(maxSeq,parseInt(m[1]));
+  });
+  return prefix+yearMonth+String(maxSeq+1).padStart(3,'0');
+}
 function showAddQuote(){
   document.getElementById('q-edit-id').value='';
-  document.getElementById('q-no').value='Q'+new Date().toISOString().slice(2,4)+new Date().toISOString().slice(5,7)+'001';
+  document.getElementById('q-no').value=genNextNo('Q');
   document.getElementById('q-date').value=new Date().toISOString().slice(0,10);
   ['q-contact','q-phone','q-taxid','q-addr'].forEach(id=>document.getElementById(id).value='');
+  refreshCustomerDropdowns();
+  document.getElementById('q-customer').value='';
   document.getElementById('q-note1').value='報價單有效期限:60天';
   document.getElementById('q-note2').value='付款方式:月結30天';
   document.getElementById('q-items-container').innerHTML='';
@@ -1417,9 +1485,11 @@ function showAddQuote(){
 }
 function showAddInvoice(){
   document.getElementById('i-edit-id').value='';
-  document.getElementById('i-no').value='P'+new Date().toISOString().slice(2,4)+new Date().toISOString().slice(5,7)+'001';
+  document.getElementById('i-no').value=genNextNo('P');
   document.getElementById('i-date').value=new Date().toISOString().slice(0,10);
   ['i-contact','i-addr','i-taxid','i-bank-no','i-bank-name','i-bank-holder'].forEach(id=>document.getElementById(id).value='');
+  refreshCustomerDropdowns();
+  document.getElementById('i-customer').value='';
   document.getElementById('i-status').value='pending';
   document.getElementById('i-items-container').innerHTML='';
   addDocItem('i'); addDocItem('i'); addDocItem('i');
@@ -1847,6 +1917,83 @@ ${bankSection}
     const a = document.createElement('a');
     a.href = url; a.download = title+'_'+( doc.no||'doc')+'.html';
     a.click();
+  }
+}
+
+// ==================== CUSTOMER MANAGEMENT ====================
+function showAddCustomer(){
+  document.getElementById('cust-edit-id').value='';
+  ['cust-name','cust-contact','cust-phone','cust-taxid','cust-addr'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cust-modal-title').textContent='🏢 新增客戶';
+  document.getElementById('cust-modal-btn').textContent='確認新增';
+  document.getElementById('modal-customer').classList.add('show');
+}
+function editCustomer(id){
+  const cust=state.customers.find(x=>x.id===id); if(!cust) return;
+  document.getElementById('cust-edit-id').value=cust.id;
+  document.getElementById('cust-name').value=cust.name||'';
+  document.getElementById('cust-contact').value=cust.contact||'';
+  document.getElementById('cust-phone').value=cust.phone||'';
+  document.getElementById('cust-taxid').value=cust.taxid||'';
+  document.getElementById('cust-addr').value=cust.addr||'';
+  document.getElementById('cust-modal-title').textContent='✏️ 編輯客戶';
+  document.getElementById('cust-modal-btn').textContent='儲存修改';
+  document.getElementById('modal-customer').classList.add('show');
+}
+function saveCustomer(){
+  const name=document.getElementById('cust-name').value.trim();
+  if(!name){showNotif('請輸入客戶名稱',true);return;}
+  const editId=parseInt(document.getElementById('cust-edit-id').value);
+  const rec={
+    id:editId||Date.now(),
+    name,
+    contact:document.getElementById('cust-contact').value,
+    phone:document.getElementById('cust-phone').value,
+    taxid:document.getElementById('cust-taxid').value,
+    addr:document.getElementById('cust-addr').value,
+  };
+  const idx=state.customers.findIndex(x=>x.id===rec.id);
+  if(idx>=0) state.customers[idx]=rec; else state.customers.push(rec);
+  saveState(); closeModal('modal-customer'); renderCustomers(); showNotif('✅ 客戶已儲存');
+  refreshCustomerDropdowns();
+}
+function deleteCustomer(id){
+  if(!confirm('確定刪除此客戶？')) return;
+  state.customers=state.customers.filter(x=>x.id!==id);
+  saveState(); renderCustomers(); refreshCustomerDropdowns();
+}
+function renderCustomers(){
+  const tb=document.getElementById('customers-table'); if(!tb) return;
+  if(!state.customers.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#7a8399;padding:20px">尚無客戶，點右上角新增</td></tr>';return;}
+  tb.innerHTML=state.customers.map(c=>`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td>${c.contact||'—'}</td>
+    <td class="text-mono">${c.phone||'—'}</td>
+    <td class="text-mono">${c.taxid||'—'}</td>
+    <td><div class="gap-actions">
+      <button class="btn btn-outline" style="font-size:11px;padding:4px 9px" onclick="editCustomer(${c.id})">✏️ 編輯</button>
+      <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteCustomer(${c.id})">刪除</button>
+    </div></td>
+  </tr>`).join('');
+}
+function refreshCustomerDropdowns(){
+  ['q-customer','i-customer'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    el.innerHTML='<option value="">— 選擇客戶（或手動輸入）—</option>';
+    state.customers.forEach(c=>{el.innerHTML+=`<option value="${c.id}">${c.name}${c.contact?' · '+c.contact:''}</option>`;});
+    el.value=cur;
+  });
+}
+function fillDocCustomer(prefix){
+  const sel=document.getElementById(prefix+'-customer');
+  const custId=parseInt(sel.value);
+  const cust=state.customers.find(x=>x.id===custId);
+  if(cust){
+    const contactEl=document.getElementById(prefix+'-contact'); if(contactEl) contactEl.value=cust.contact||'';
+    const phoneEl=document.getElementById(prefix+'-phone'); if(phoneEl) phoneEl.value=cust.phone||'';
+    const taxidEl=document.getElementById(prefix+'-taxid'); if(taxidEl) taxidEl.value=cust.taxid||'';
+    const addrEl=document.getElementById(prefix+'-addr'); if(addrEl) addrEl.value=cust.addr||'';
   }
 }
 
