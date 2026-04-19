@@ -1330,7 +1330,7 @@ function initEmployee() {
   // Show leave tab only for 高瑋峻 (staffId=1)
   const leaveTab=document.getElementById('emp-leave-tab');
   if(leaveTab) leaveTab.classList.toggle('hidden', empStaffId!==1);
-  renderEmpLeave();
+  if(empStaffId===1) renderEmpLeave();
 }
 function updateEmpClock(){
   const now=new Date();
@@ -1353,13 +1353,16 @@ function onEmpIdentity(){
   // Show leave tab only for 高瑋峻 (staffId=1)
   const leaveTab=document.getElementById('emp-leave-tab');
   if(leaveTab) leaveTab.classList.toggle('hidden', empStaffId!==1);
-  renderEmpLeave();
+  if(empStaffId===1) renderEmpLeave();
 }
 function changeIdentity(){
   if(confirm('確定要登出嗎？')) logout();
 }
 function empSwitchTab(tab){
-  ['clock','salary','bonus','leave'].forEach(t=>{const el=document.getElementById('emp-tab-'+t); if(el) el.classList.toggle('hidden',t!==tab);});
+  ['clock','salary','bonus','leave'].forEach(t=>{
+    const el=document.getElementById('emp-tab-'+t);
+    if(el) el.classList.toggle('hidden',t!==tab);
+  });
   document.querySelectorAll('.emp-tab').forEach(el=>{
     const t=el.getAttribute('onclick')?.match(/empSwitchTab\('(\w+)'\)/)?.[1];
     if(t) el.classList.toggle('active',t===tab);
@@ -1382,14 +1385,18 @@ function renderEmpLeave(){
   if(!list) return;
   const sm={pending:'待審核',approved:'已核准',rejected:'已拒絕'};
   const sc={pending:'#e8a020',approved:'#4caf82',rejected:'#e05555'};
-  list.innerHTML=myLeaves.length?[...myLeaves].reverse().map(l=>`
-    <div class="emp-bonus-item">
-      <div>
-        <div class="emp-bonus-name">${l.typeName} · ${l.days}天</div>
-        <div class="emp-bonus-client">${l.start} ～ ${l.end}${l.reason?' · '+l.reason:''}</div>
-      </div>
-      <div style="font-size:12px;font-weight:700;color:${sc[l.status]||'#7a8399'}">${sm[l.status]||'—'}</div>
-    </div>`).join(''): '<div class="emp-empty"><div class="emp-empty-icon">🏖️</div>尚無請假記錄</div>';
+  list.innerHTML=myLeaves.length
+    ? [...myLeaves].reverse().map(l=>`
+        <div class="emp-record" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+            <div style="font-size:14px;font-weight:700">${l.typeName}</div>
+            <div style="font-size:13px;font-weight:700;color:${sc[l.status]||'#7a8399'}">${sm[l.status]||'—'}</div>
+          </div>
+          <div style="font-size:12px;color:#6b7280">${l.start} ～ ${l.end}　共 <strong>${l.days}</strong> 天</div>
+          ${l.reason?`<div style="font-size:12px;color:#6b7280">原因：${l.reason}</div>`:''}
+          ${l.status==='rejected'?'<div style="font-size:11px;color:#dc2626">已被拒絕，請聯繫老闆確認</div>':''}
+        </div>`).join('')
+    : '<div class="emp-empty"><div class="emp-empty-icon">🏖️</div>尚無請假記錄</div>';
 }
 
 function empPunch(type){
@@ -2275,7 +2282,7 @@ function saveLeave() {
   const editId=parseInt(document.getElementById('leave-edit-id').value);
   if(editId){ const idx=state.leaves.findIndex(l=>l.id===editId); if(idx>=0) state.leaves[idx]=rec; }
   else state.leaves.push(rec);
-  saveState(); closeModal('modal-leave'); admRenderLeaves(); showNotif('✅ 請假申請已送出');
+  saveState(); closeModal('modal-leave'); admRenderLeaves(); renderEmpLeave(); showNotif('✅ 請假申請已送出，等待老闆審核');
 }
 
 function approveLeave(id, approved) {
