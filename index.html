@@ -100,8 +100,9 @@ display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-
 .adm-nav-item {
 display:flex; align-items:center; gap:9px; padding:9px 11px;
 border-radius:8px; cursor:pointer; font-size:13px; color:#7a8399;
-transition:all 0.15s; margin-bottom:2px;
+transition:all 0.15s; margin-bottom:2px; overflow:hidden; white-space:nowrap;
 }
+.adm-nav-item span:last-child { overflow:hidden; text-overflow:ellipsis; }
 .adm-nav-item:hover { background:#1e2430; color:#e8eaf0; }
 .adm-nav-item.active { background:rgba(232,160,32,0.12); color:var(–accent); }
 .adm-nav-icon { font-size:15px; width:18px; text-align:center; }
@@ -349,6 +350,7 @@ position:sticky; top:0; z-index:50;
       <div class="adm-nav-item active" onclick="admGoTo('dashboard',this)"><span class="adm-nav-icon">📊</span><span>總覽</span></div>
       <div class="adm-nav-item" onclick="admGoTo('attendance',this)"><span class="adm-nav-icon">🕐</span><span>打卡記錄</span></div>
       <div class="adm-nav-item" onclick="admGoTo('salary',this)"><span class="adm-nav-icon">💰</span><span>薪資計算</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('leaves',this)"><span class="adm-nav-icon">🏖️</span><span>請假管理</span></div>
       <div class="adm-nav-label">業務</div>
       <div class="adm-nav-item" onclick="admGoTo('orders',this)"><span class="adm-nav-icon">📋</span><span>案件管理</span></div>
       <div class="adm-nav-item" onclick="admGoTo('bonus',this)"><span class="adm-nav-icon">🎯</span><span>獎金總覽</span></div>
@@ -478,6 +480,22 @@ position:sticky; top:0; z-index:50;
     </div>
   </div>
 
+  <!-- Leaves 請假管理 -->
+  <div class="adm-page" id="adm-leaves">
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">高瑋峻 本年特休剩餘</div><div class="stat-value" id="leave-remain">— <small>天</small></div></div>
+      <div class="stat-card green"><div class="stat-label">本月請假天數</div><div class="stat-value" id="leave-month-count">0 <small>天</small></div></div>
+    </div>
+    <div class="card">
+      <div class="flex-between">
+        <div class="card-title" style="margin-bottom:0">請假申請記錄</div>
+      </div>
+      <div class="divider"></div>
+      <table><thead><tr><th>申請人</th><th>假別</th><th>開始日期</th><th>結束日期</th><th>天數</th><th>原因</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="leaves-table"></tbody></table>
+    </div>
+  </div>
+
   <!-- Quotes 報價單 -->
   <div class="adm-page" id="adm-quotes">
     <div class="flex-between">
@@ -550,10 +568,11 @@ position:sticky; top:0; z-index:50;
     </div>
 
 ```
-<div class="emp-tabs">
+<div class="emp-tabs" id="emp-tabs-container">
   <div class="emp-tab active" onclick="empSwitchTab('clock')">🕐 打卡</div>
   <div class="emp-tab" onclick="empSwitchTab('salary')">💰 薪資</div>
   <div class="emp-tab" onclick="empSwitchTab('bonus')">🎯 獎金</div>
+  <div class="emp-tab hidden" id="emp-leave-tab" onclick="empSwitchTab('leave')">🏖️ 請假</div>
 </div>
 
 <!-- Clock tab -->
@@ -775,6 +794,40 @@ position:sticky; top:0; z-index:50;
   </div>
 </div>
 
+<!-- Leave Modal (employee applies) -->
+
+<div class="modal-overlay" id="modal-leave">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">🏖️ 請假申請</div>
+    <input type="hidden" id="leave-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label>假別</label>
+        <select id="leave-type">
+          <option value="annual">特休假</option>
+          <option value="sick">病假</option>
+          <option value="personal">事假</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>開始日期</label><input type="date" id="leave-start" oninput="calcLeaveDays()"></div>
+      <div class="form-group"><label>結束日期</label><input type="date" id="leave-end" oninput="calcLeaveDays()"></div>
+    </div>
+    <div style="background:#1e2430;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#7a8399;font-size:13px">請假天數</span>
+      <span id="leave-days-display" style="font-family:DM Mono,monospace;font-size:20px;font-weight:700;color:var(--accent)">0 天</span>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>請假原因</label><input type="text" id="leave-reason" placeholder="選填"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-leave')">取消</button>
+      <button class="btn btn-primary" onclick="saveLeave()">送出申請</button>
+    </div>
+  </div>
+</div>
+
 <div class="notification" id="notification"></div>
 <div class="toast" id="toast"></div>
 
@@ -819,7 +872,7 @@ function loadState() {
       {id:1,name:'高瑋峻',role:'安裝師傅',type:'fulltime',salType:'monthly',base:35000,active:true},
       {id:2,name:'林育正',role:'兼職業務',type:'parttime',salType:'monthly',base:0,active:true},
     ],
-    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],
+    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],leaves:[],
   };
 }
 function saveState() { localStorage.setItem('gaoduo_state', JSON.stringify(state)); }
@@ -875,7 +928,7 @@ function updateAdmClock() {
   const d=document.getElementById('adm-clock-date'); if(d) d.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
   const ad=document.getElementById('adm-date'); if(ad) ad.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
 }
-const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
+const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],leaves:['請假','管理'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
 function admGoTo(page,el) {
   document.querySelectorAll('.adm-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.remove('active'));
@@ -887,7 +940,7 @@ function admGoTo(page,el) {
 }
 function admRenderAll() {
   state=loadState();
-  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables();
+  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables(); admRenderLeaves();
 }
 function admRenderDropdowns() {
   ['punch-staff','sal-staff','ord-sales'].forEach(id=>{
@@ -917,13 +970,21 @@ function admRenderAtt() {
   const rows=state.attendance.filter(a=>!month||a.date.startsWith(month));
   if(!rows.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#7a8399;padding:20px">尚無記錄</td></tr>';return;}
   tb.innerHTML=[...rows].reverse().map(a=>{
-    const hrs=a.out?((new Date(a.out)-new Date(a.in))/3600000).toFixed(1):'—';
+    let hrs='—';
+    if(a.out){
+      const rawHrs=(new Date(a.out)-new Date(a.in))/3600000;
+      const netHrs=Math.max(0,rawHrs-1);
+      hrs=netHrs.toFixed(1)+(a.halfPay?'(半)':'');
+    }
     const name=state.staff.find(s=>s.id==a.staffId)?.name||'—';
+    const {lateIn,earlyOut} = getAttendanceStatus(a.staffId, a.inTime, a.outTime);
+    const lateTag = lateIn ? '<span class="badge badge-red" style="margin-left:4px;font-size:10px">遲到</span>' : '';
+    const earlyTag = earlyOut ? '<span class="badge badge-red" style="margin-left:4px;font-size:10px">早退</span>' : '';
     const isGwj = a.staffId === 1;
     const halfBtn = isGwj
       ? `<button onclick="toggleHalfPay('${a.staffId}','${a.date}')" style="margin-left:8px;padding:2px 8px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;${a.halfPay?'background:rgba(232,160,32,0.2);color:#e8a020':'background:rgba(76,175,130,0.15);color:#4caf82'}">${a.halfPay?'半薪':'全薪'}</button>`
       : '';
-    return `<tr><td>${name}${halfBtn}</td><td class="text-mono">${a.date}</td><td class="text-mono text-green">${a.inTime}</td><td class="text-mono text-red">${a.outTime||'—'}</td><td class="text-mono">${hrs!=='—'?hrs+' hr':'—'}</td></tr>`;
+    return `<tr><td>${name}${halfBtn}</td><td class="text-mono">${a.date}</td><td class="text-mono text-green">${a.inTime}${lateTag}</td><td class="text-mono text-red">${a.outTime||'—'}${earlyTag}</td><td class="text-mono">${hrs!=='—'?hrs+' hr':'—'}</td></tr>`;
   }).join('');
 }
 function renderAttTable(){admRenderAtt();}
@@ -1020,13 +1081,41 @@ function calcSalary() {
   const bonus=parseFloat(document.getElementById('sal-bonus').value)||0;
   const deduct=parseFloat(document.getElementById('sal-deduct').value)||0;
   let basePay=0,breakdown=[];
-  if(type==='monthly'){basePay=base;breakdown.push(['底薪',base]);}
+  const gwjStaffId=parseInt(document.getElementById('sal-staff').value);
+  const gwjStaff=state.staff.find(x=>x.id===gwjStaffId);
+  // For 高瑋峻: calculate based on actual attendance (8hr/day standard, lunch deducted)
+  if(type==='monthly'){
+    const salMonth=document.getElementById('sal-month').value;
+    const myAtt=state.attendance.filter(a=>a.staffId===gwjStaffId&&a.date.startsWith(salMonth)&&a.out);
+    // Count days: halfPay days=0.5, full days=1, check leave deductions
+    const approvedLeaves=state.leaves.filter(l=>l.staffId===gwjStaffId&&l.status==='approved'&&l.start.startsWith(salMonth));
+    const leaveDays=approvedLeaves.reduce((s,l)=>s+(l.type==='personal'?l.days:0),0); // 事假扣薪
+    const workDays=myAtt.reduce((s,a)=>s+(a.halfPay?0.5:1),0);
+    basePay=base;
+    breakdown.push(['底薪',base]);
+    if(myAtt.length) breakdown.push(['出勤天數',workDays+' 天（含'+myAtt.filter(a=>a.halfPay).length+'天半薪）']);
+    if(leaveDays>0){const deductAmt=Math.round(base/30*leaveDays);breakdown.push(['事假扣薪（'+leaveDays+'天）',-deductAmt]);basePay-=deductAmt;}
+  }
   else{
+    const salMonth2=document.getElementById('sal-month').value;
+    const staffId2=parseInt(document.getElementById('sal-staff').value);
+    // Auto-calculate from attendance if available
+    const attRecs=state.attendance.filter(a=>a.staffId===staffId2&&a.date.startsWith(salMonth2)&&a.out);
+    let autoHrs=0;
+    if(attRecs.length){
+      attRecs.forEach(a=>{
+        const rawHrs=(new Date(a.out)-new Date(a.in))/3600000;
+        autoHrs+=Math.max(0,rawHrs-1); // deduct 1hr lunch
+      });
+      autoHrs=parseFloat(autoHrs.toFixed(1));
+      document.getElementById('sal-hours').value=autoHrs;
+    }
     const hrs=parseFloat(document.getElementById('sal-hours').value)||0;
     const ot=parseFloat(document.getElementById('sal-ot').value)||0;
     basePay=hrs*base+ot*base*1.34;
-    breakdown.push(['正常工時薪資',hrs*base]);
-    if(ot>0) breakdown.push(['加班費',ot*base*1.34]);
+    breakdown.push(['實際工時（已扣午休）',hrs+' 小時 × $'+base]);
+    breakdown.push(['工時薪資',hrs*base]);
+    if(ot>0) breakdown.push(['加班費（1.34倍）',ot*base*1.34]);
   }
   if(bonus) breakdown.push(['獎金',bonus]);
   if(deduct) breakdown.push(['扣款',-deduct]);
@@ -1135,6 +1224,10 @@ function initEmployee() {
     document.getElementById('emp-id-selector').classList.add('hidden');
   }
   renderEmpClock(); renderEmpSalary(); renderEmpBonus();
+  // Show leave tab only for 高瑋峻 (staffId=1)
+  const leaveTab=document.getElementById('emp-leave-tab');
+  if(leaveTab) leaveTab.classList.toggle('hidden', empStaffId!==1);
+  renderEmpLeave();
 }
 function updateEmpClock(){
   const now=new Date();
@@ -1154,16 +1247,48 @@ function onEmpIdentity(){
   document.getElementById('emp-name-badge').textContent=(s?s.name+'（'+s.role+'）':'選擇身份')+' ▾';
   document.getElementById('emp-id-selector').classList.add('hidden');
   renderEmpClock(); renderEmpSalary(); renderEmpBonus();
+  // Show leave tab only for 高瑋峻 (staffId=1)
+  const leaveTab=document.getElementById('emp-leave-tab');
+  if(leaveTab) leaveTab.classList.toggle('hidden', empStaffId!==1);
+  renderEmpLeave();
 }
 function changeIdentity(){
   if(confirm('確定要登出嗎？')) logout();
 }
 function empSwitchTab(tab){
-  ['clock','salary','bonus'].forEach(t=>{document.getElementById('emp-tab-'+t).classList.toggle('hidden',t!==tab);});
-  document.querySelectorAll('.emp-tab').forEach((el,i)=>{el.classList.toggle('active',['clock','salary','bonus'][i]===tab);});
+  ['clock','salary','bonus','leave'].forEach(t=>{const el=document.getElementById('emp-tab-'+t); if(el) el.classList.toggle('hidden',t!==tab);});
+  document.querySelectorAll('.emp-tab').forEach(el=>{
+    const t=el.getAttribute('onclick')?.match(/empSwitchTab\('(\w+)'\)/)?.[1];
+    if(t) el.classList.toggle('active',t===tab);
+  });
   if(tab==='salary') renderEmpSalary();
   if(tab==='bonus') renderEmpBonus();
+  if(tab==='leave') renderEmpLeave();
 }
+function renderEmpLeave(){
+  state=loadState();
+  if(empStaffId!==1) return;
+  const thisYear=new Date().getFullYear();
+  const usedAnnual=state.leaves.filter(l=>l.type==='annual'&&l.status==='approved'&&l.start.startsWith(thisYear)).reduce((s,l)=>s+l.days,0);
+  const remain=7-usedAnnual;
+  const pending=state.leaves.filter(l=>l.staffId===1&&l.status==='pending').length;
+  const el1=document.getElementById('emp-leave-remain'); if(el1) el1.textContent=remain+' 天';
+  const el2=document.getElementById('emp-leave-pending'); if(el2) el2.textContent=pending+' 件';
+  const myLeaves=state.leaves.filter(l=>l.staffId===1);
+  const list=document.getElementById('emp-leave-list');
+  if(!list) return;
+  const sm={pending:'待審核',approved:'已核准',rejected:'已拒絕'};
+  const sc={pending:'#e8a020',approved:'#4caf82',rejected:'#e05555'};
+  list.innerHTML=myLeaves.length?[...myLeaves].reverse().map(l=>`
+    <div class="emp-bonus-item">
+      <div>
+        <div class="emp-bonus-name">${l.typeName} · ${l.days}天</div>
+        <div class="emp-bonus-client">${l.start} ～ ${l.end}${l.reason?' · '+l.reason:''}</div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:${sc[l.status]||'#7a8399'}">${sm[l.status]||'—'}</div>
+    </div>`).join(''): '<div class="emp-empty"><div class="emp-empty-icon">🏖️</div>尚無請假記錄</div>';
+}
+
 function empPunch(type){
   if(!empStaffId){showToast('請先選擇你的名字',true);return;}
   // Show locating indicator
@@ -1232,7 +1357,8 @@ function renderEmpClock(){
   const myAtt=state.attendance.filter(a=>a.staffId===empStaffId&&a.date.startsWith(month));
   const list=document.getElementById('emp-att-list');
   list.innerHTML=myAtt.length?[...myAtt].reverse().map(a=>{
-    const hrs=a.out?((new Date(a.out)-new Date(a.in))/3600000).toFixed(1):null;
+    let hrs=null;
+    if(a.out){ const raw=(new Date(a.out)-new Date(a.in))/3600000; hrs=(Math.max(0,raw-1)).toFixed(1); }
     const halfTag = a.halfPay ? ' <span style="font-size:10px;background:rgba(232,160,32,0.2);color:#e8a020;padding:1px 6px;border-radius:4px">半薪</span>' : '';
     const distTag = a.dist ? ` <span style="font-size:10px;color:#6b7280">${a.locName||''}・${a.dist}m</span>` : '';
     return `<div class="emp-record"><div><div class="emp-record-date">${a.date}${halfTag}</div><div class="emp-record-times">上班 ${a.inTime} ／ 下班 ${a.outTime||'—'}${distTag}</div></div><div><div class="emp-record-hrs">${hrs?hrs+'hr':'上班中'}</div><div class="emp-record-lbl">工時</div></div></div>`;
@@ -1250,6 +1376,8 @@ function renderEmpSalary(){
   if(saved){total=saved.total;rows=[['薪資（老闆已確認）',saved.total]];}
   else if(s.salType==='monthly'){rows.push(['底薪（試算）',s.base]);total=s.base;}
   else{const pay=Math.round(totalHrs*s.base);rows.push([`時薪 ${totalHrs.toFixed(1)}hr × $${s.base}（試算）`,pay]);total=pay;}
+  // For 林育正 (id=2): note hourly pay
+  const salNote = (s.id===2) ? ' (時薪制，依打卡時數計算)' : '';
   document.getElementById('e-sal-total').textContent='$'+total.toLocaleString('zh-TW');
   document.getElementById('e-sal-month-lbl').textContent=month+(saved?'（老闆已確認）':'（試算，未經確認）');
   document.getElementById('e-sal-detail').innerHTML=rows.map(([k,v])=>`<div class="emp-status-row"><span class="emp-status-key">${k}</span><span class="emp-status-val">$${Math.abs(v).toLocaleString('zh-TW')}</span></div>`).join('')+`<div class="emp-status-row"><span class="emp-status-key">本月出勤天數</span><span class="emp-status-val a">${myAtt.length} 天</span></div>`;
@@ -1722,7 +1850,235 @@ ${bankSection}
   }
 }
 
-// ==================== UTILS ====================// ==================== UTILS ====================
+// ==================== LEAVE MANAGEMENT ====================
+// 勞基法：到職未滿6月=0天，6月~1年=3天，1~2年=7天，2~3年=10天，每年遞增1天，3年後每2年加1天，最多30天
+const LEAVE_TYPES = {annual:'特休假',sick:'病假',personal:'事假'};
+// 2026 Taiwan national holidays
+const HOLIDAYS_2026 = ['2026-01-01','2026-01-28','2026-01-29','2026-01-30','2026-01-31','2026-02-01','2026-02-02',
+  '2026-02-28','2026-04-04','2026-04-05','2026-05-01','2026-06-19','2026-09-03','2026-10-10'];
+
+function isHoliday(dateStr) {
+  const d = new Date(dateStr);
+  const dow = d.getDay();
+  return dow===0 || dow===6 || HOLIDAYS_2026.includes(dateStr);
+}
+
+function calcWorkDays(start, end) {
+  let count=0, cur=new Date(start);
+  const endD=new Date(end);
+  while(cur<=endD){ if(!isHoliday(cur.toISOString().slice(0,10))) count++; cur.setDate(cur.getDate()+1); }
+  return count;
+}
+
+function calcLeaveDays() {
+  const s=document.getElementById('leave-start').value;
+  const e=document.getElementById('leave-end').value;
+  if(s&&e&&s<=e){ const days=calcWorkDays(s,e); document.getElementById('leave-days-display').textContent=days+' 天'; }
+}
+
+function showAddLeave() {
+  document.getElementById('leave-edit-id').value='';
+  document.getElementById('leave-type').value='annual';
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('leave-start').value=today;
+  document.getElementById('leave-end').value=today;
+  document.getElementById('leave-reason').value='';
+  calcLeaveDays();
+  document.getElementById('modal-leave').classList.add('show');
+}
+
+function saveLeave() {
+  const start=document.getElementById('leave-start').value;
+  const end=document.getElementById('leave-end').value;
+  if(!start||!end||start>end){showNotif('請填寫正確日期',true);return;}
+  const days=calcWorkDays(start,end);
+  const type=document.getElementById('leave-type').value;
+  // Check annual leave balance
+  if(type==='annual'){
+    const used=state.leaves.filter(l=>l.type==='annual'&&l.status!=='rejected'&&l.start.startsWith(new Date().getFullYear())).reduce((s,l)=>s+l.days,0);
+    if(used+days>7){showNotif('特休假不足，本年度剩餘 '+(7-used)+' 天',true);return;}
+  }
+  const rec={
+    id:Date.now(),staffId:1,staffName:'高瑋峻',
+    type,typeName:LEAVE_TYPES[type],
+    start,end,days,
+    reason:document.getElementById('leave-reason').value,
+    status:'pending',applyDate:new Date().toISOString().slice(0,10),
+  };
+  const editId=parseInt(document.getElementById('leave-edit-id').value);
+  if(editId){ const idx=state.leaves.findIndex(l=>l.id===editId); if(idx>=0) state.leaves[idx]=rec; }
+  else state.leaves.push(rec);
+  saveState(); closeModal('modal-leave'); admRenderLeaves(); showNotif('✅ 請假申請已送出');
+}
+
+function approveLeave(id, approved) {
+  const l=state.leaves.find(x=>x.id===id); if(!l) return;
+  l.status=approved?'approved':'rejected';
+  saveState(); admRenderLeaves();
+  showNotif(approved?'✅ 已核准請假':'已拒絕請假');
+}
+
+function admRenderLeaves() {
+  const tb=document.getElementById('leaves-table'); if(!tb) return;
+  if(!state.leaves.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無請假記錄</td></tr>';return;}
+  const sm={pending:['badge-amber','待審核'],approved:['badge-green','已核准'],rejected:['badge-red','已拒絕']};
+  tb.innerHTML=[...state.leaves].reverse().map(l=>{
+    const [cls,lbl]=sm[l.status]||['badge-amber','待審核'];
+    const actions=l.status==='pending'
+      ? `<div class="gap-actions"><button class="btn btn-success" style="font-size:11px;padding:4px 9px" onclick="approveLeave(${l.id},true)">核准</button><button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="approveLeave(${l.id},false)">拒絕</button></div>`
+      : `<button class="btn btn-outline" style="font-size:11px;padding:4px 9px" onclick="deleteLeave(${l.id})">刪除</button>`;
+    return `<tr><td>${l.staffName}</td><td>${l.typeName}</td><td class="text-mono">${l.start}</td><td class="text-mono">${l.end}</td><td class="text-mono text-accent">${l.days} 天</td><td>${l.reason||'—'}</td><td><span class="badge ${cls}">${lbl}</span></td><td>${actions}</td></tr>`;
+  }).join('');
+  // Update stats
+  const thisYear=new Date().getFullYear();
+  const usedAnnual=state.leaves.filter(l=>l.type==='annual'&&l.status==='approved'&&l.start.startsWith(thisYear)).reduce((s,l)=>s+l.days,0);
+  const el1=document.getElementById('leave-remain'); if(el1) el1.innerHTML=(7-usedAnnual)+' <small>天</small>';
+  const thisMonth=new Date().toISOString().slice(0,7);
+  const monthLeaves=state.leaves.filter(l=>l.status==='approved'&&l.start.startsWith(thisMonth)).reduce((s,l)=>s+l.days,0);
+  const el2=document.getElementById('leave-month-count'); if(el2) el2.innerHTML=monthLeaves+' <small>天</small>';
+}
+
+function deleteLeave(id){
+  if(!confirm('確定刪除？')) return;
+  state.leaves=state.leaves.filter(l=>l.id!==id); saveState(); admRenderLeaves();
+}
+
+// ==================== ATTENDANCE VALIDATION ====================
+// Check if punch time is within flex window (±30 min of 9:00/18:00)
+function getAttendanceStatus(staffId, inTime, outTime) {
+  const s = state.staff.find(x=>x.id===staffId);
+  if(!s) return {};
+  // Only validate 高瑋峻 (id=1) and 林育正 (id=2) 
+  const inH=parseInt(inTime.split(':')[0]), inM=parseInt(inTime.split(':')[1]);
+  const inTotal=inH*60+inM;
+  const startWindow=8*60+30; // 08:30 earliest
+  const startLate=9*60+30;   // 09:30 latest (late after this)
+  let lateIn=false, earlyOut=false;
+  if(inTotal>startLate) lateIn=true;
+  if(outTime){
+    const outH=parseInt(outTime.split(':')[0]), outM=parseInt(outTime.split(':')[1]);
+    const outTotal=outH*60+outM;
+    const endEarly=17*60+30; // 17:30 earliest (early leave before this)
+    if(outTotal<endEarly) earlyOut=true;
+  }
+  return {lateIn,earlyOut};
+}
+
+// ==================== UTILS ====================// ==================== LEAVE MANAGEMENT ====================
+// 勞基法：到職未滿6月=0天，6月~1年=3天，1~2年=7天，2~3年=10天，每年遞增1天，3年後每2年加1天，最多30天
+const LEAVE_TYPES = {annual:'特休假',sick:'病假',personal:'事假'};
+// 2026 Taiwan national holidays
+const HOLIDAYS_2026 = ['2026-01-01','2026-01-28','2026-01-29','2026-01-30','2026-01-31','2026-02-01','2026-02-02',
+  '2026-02-28','2026-04-04','2026-04-05','2026-05-01','2026-06-19','2026-09-03','2026-10-10'];
+
+function isHoliday(dateStr) {
+  const d = new Date(dateStr);
+  const dow = d.getDay();
+  return dow===0 || dow===6 || HOLIDAYS_2026.includes(dateStr);
+}
+
+function calcWorkDays(start, end) {
+  let count=0, cur=new Date(start);
+  const endD=new Date(end);
+  while(cur<=endD){ if(!isHoliday(cur.toISOString().slice(0,10))) count++; cur.setDate(cur.getDate()+1); }
+  return count;
+}
+
+function calcLeaveDays() {
+  const s=document.getElementById('leave-start').value;
+  const e=document.getElementById('leave-end').value;
+  if(s&&e&&s<=e){ const days=calcWorkDays(s,e); document.getElementById('leave-days-display').textContent=days+' 天'; }
+}
+
+function showAddLeave() {
+  document.getElementById('leave-edit-id').value='';
+  document.getElementById('leave-type').value='annual';
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('leave-start').value=today;
+  document.getElementById('leave-end').value=today;
+  document.getElementById('leave-reason').value='';
+  calcLeaveDays();
+  document.getElementById('modal-leave').classList.add('show');
+}
+
+function saveLeave() {
+  const start=document.getElementById('leave-start').value;
+  const end=document.getElementById('leave-end').value;
+  if(!start||!end||start>end){showNotif('請填寫正確日期',true);return;}
+  const days=calcWorkDays(start,end);
+  const type=document.getElementById('leave-type').value;
+  // Check annual leave balance
+  if(type==='annual'){
+    const used=state.leaves.filter(l=>l.type==='annual'&&l.status!=='rejected'&&l.start.startsWith(new Date().getFullYear())).reduce((s,l)=>s+l.days,0);
+    if(used+days>7){showNotif('特休假不足，本年度剩餘 '+(7-used)+' 天',true);return;}
+  }
+  const rec={
+    id:Date.now(),staffId:1,staffName:'高瑋峻',
+    type,typeName:LEAVE_TYPES[type],
+    start,end,days,
+    reason:document.getElementById('leave-reason').value,
+    status:'pending',applyDate:new Date().toISOString().slice(0,10),
+  };
+  const editId=parseInt(document.getElementById('leave-edit-id').value);
+  if(editId){ const idx=state.leaves.findIndex(l=>l.id===editId); if(idx>=0) state.leaves[idx]=rec; }
+  else state.leaves.push(rec);
+  saveState(); closeModal('modal-leave'); admRenderLeaves(); showNotif('✅ 請假申請已送出');
+}
+
+function approveLeave(id, approved) {
+  const l=state.leaves.find(x=>x.id===id); if(!l) return;
+  l.status=approved?'approved':'rejected';
+  saveState(); admRenderLeaves();
+  showNotif(approved?'✅ 已核准請假':'已拒絕請假');
+}
+
+function admRenderLeaves() {
+  const tb=document.getElementById('leaves-table'); if(!tb) return;
+  if(!state.leaves.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無請假記錄</td></tr>';return;}
+  const sm={pending:['badge-amber','待審核'],approved:['badge-green','已核准'],rejected:['badge-red','已拒絕']};
+  tb.innerHTML=[...state.leaves].reverse().map(l=>{
+    const [cls,lbl]=sm[l.status]||['badge-amber','待審核'];
+    const actions=l.status==='pending'
+      ? `<div class="gap-actions"><button class="btn btn-success" style="font-size:11px;padding:4px 9px" onclick="approveLeave(${l.id},true)">核准</button><button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="approveLeave(${l.id},false)">拒絕</button></div>`
+      : `<button class="btn btn-outline" style="font-size:11px;padding:4px 9px" onclick="deleteLeave(${l.id})">刪除</button>`;
+    return `<tr><td>${l.staffName}</td><td>${l.typeName}</td><td class="text-mono">${l.start}</td><td class="text-mono">${l.end}</td><td class="text-mono text-accent">${l.days} 天</td><td>${l.reason||'—'}</td><td><span class="badge ${cls}">${lbl}</span></td><td>${actions}</td></tr>`;
+  }).join('');
+  // Update stats
+  const thisYear=new Date().getFullYear();
+  const usedAnnual=state.leaves.filter(l=>l.type==='annual'&&l.status==='approved'&&l.start.startsWith(thisYear)).reduce((s,l)=>s+l.days,0);
+  const el1=document.getElementById('leave-remain'); if(el1) el1.innerHTML=(7-usedAnnual)+' <small>天</small>';
+  const thisMonth=new Date().toISOString().slice(0,7);
+  const monthLeaves=state.leaves.filter(l=>l.status==='approved'&&l.start.startsWith(thisMonth)).reduce((s,l)=>s+l.days,0);
+  const el2=document.getElementById('leave-month-count'); if(el2) el2.innerHTML=monthLeaves+' <small>天</small>';
+}
+
+function deleteLeave(id){
+  if(!confirm('確定刪除？')) return;
+  state.leaves=state.leaves.filter(l=>l.id!==id); saveState(); admRenderLeaves();
+}
+
+// ==================== ATTENDANCE VALIDATION ====================
+// Check if punch time is within flex window (±30 min of 9:00/18:00)
+function getAttendanceStatus(staffId, inTime, outTime) {
+  const s = state.staff.find(x=>x.id===staffId);
+  if(!s) return {};
+  // Only validate 高瑋峻 (id=1) and 林育正 (id=2) 
+  const inH=parseInt(inTime.split(':')[0]), inM=parseInt(inTime.split(':')[1]);
+  const inTotal=inH*60+inM;
+  const startWindow=8*60+30; // 08:30 earliest
+  const startLate=9*60+30;   // 09:30 latest (late after this)
+  let lateIn=false, earlyOut=false;
+  if(inTotal>startLate) lateIn=true;
+  if(outTime){
+    const outH=parseInt(outTime.split(':')[0]), outM=parseInt(outTime.split(':')[1]);
+    const outTotal=outH*60+outM;
+    const endEarly=17*60+30; // 17:30 earliest (early leave before this)
+    if(outTotal<endEarly) earlyOut=true;
+  }
+  return {lateIn,earlyOut};
+}
+
+// ==================== UTILS ====================
 function fmoney(n){return '$'+Math.round(n||0).toLocaleString('zh-TW');}
 function showNotif(msg,isError=false){
   const el=document.getElementById('notification');
