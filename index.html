@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -26,24 +27,24 @@ body { font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidde
 
 /* ===== LOGIN SCREEN ===== */
 #screen-login {
-  min-height:100vh;
-  background: linear-gradient(160deg, #0d0f14 0%, #1a2030 60%, #0d1520 100%);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:24px;
+min-height:100vh;
+background: linear-gradient(160deg, #0d0f14 0%, #1a2030 60%, #0d1520 100%);
+display:flex; flex-direction:column; align-items:center; justify-content:center;
+padding:24px;
 }
 .login-logo { text-align:center; margin-bottom:48px; }
-.login-logo-zh { font-size:32px; font-weight:900; color:var(--accent); letter-spacing:4px; }
-.login-logo-en { font-size:12px; color:rgba(255,255,255,0.35); font-family:'DM Mono',monospace; letter-spacing:3px; margin-top:4px; }
+.login-logo-zh { font-size:32px; font-weight:900; color:var(–accent); letter-spacing:4px; }
+.login-logo-en { font-size:12px; color:rgba(255,255,255,0.35); font-family:‘DM Mono’,monospace; letter-spacing:3px; margin-top:4px; }
 .login-logo-icon { font-size:48px; margin-bottom:12px; }
 .login-subtitle { font-size:14px; color:rgba(255,255,255,0.4); margin-top:8px; }
 
 .login-cards { display:flex; flex-direction:column; gap:14px; width:100%; max-width:360px; }
 .login-card {
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:var(--radius); padding:20px 24px;
-  cursor:pointer; transition:all 0.2s; text-decoration:none;
-  display:flex; align-items:center; gap:16px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:var(–radius); padding:20px 24px;
+cursor:pointer; transition:all 0.2s; text-decoration:none;
+display:flex; align-items:center; gap:16px;
 }
 .login-card:hover, .login-card:active { background:rgba(232,160,32,0.12); border-color:rgba(232,160,32,0.4); transform:scale(1.01); }
 .login-card-icon { font-size:28px; width:48px; text-align:center; }
@@ -53,55 +54,55 @@ body { font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidde
 .login-card-arrow { margin-left:auto; color:rgba(255,255,255,0.3); font-size:18px; }
 
 .admin-card { border-color:rgba(232,160,32,0.25); }
-.admin-card .login-card-title { color:var(--accent); }
+.admin-card .login-card-title { color:var(–accent); }
 
 /* Admin password modal */
 .pw-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999;
-  display:flex; align-items:center; justify-content:center; padding:24px;
+position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999;
+display:flex; align-items:center; justify-content:center; padding:24px;
 }
 .pw-box {
-  background:#161a22; border:1px solid #2a3040; border-radius:var(--radius);
-  padding:28px; width:100%; max-width:340px;
+background:#161a22; border:1px solid #2a3040; border-radius:var(–radius);
+padding:28px; width:100%; max-width:340px;
 }
 .pw-title { font-size:17px; font-weight:700; color:#fff; margin-bottom:6px; }
 .pw-subtitle { font-size:13px; color:#7a8399; margin-bottom:20px; }
 .pw-input {
-  width:100%; padding:12px 14px; border-radius:10px;
-  border:1.5px solid #2a3040; background:#1e2430; color:#fff;
-  font-size:16px; font-family:'DM Mono',monospace; letter-spacing:4px;
-  outline:none; margin-bottom:12px;
+width:100%; padding:12px 14px; border-radius:10px;
+border:1.5px solid #2a3040; background:#1e2430; color:#fff;
+font-size:16px; font-family:‘DM Mono’,monospace; letter-spacing:4px;
+outline:none; margin-bottom:12px;
 }
-.pw-input:focus { border-color:var(--accent); }
+.pw-input:focus { border-color:var(–accent); }
 .pw-actions { display:flex; gap:10px; }
 .pw-btn {
-  flex:1; padding:12px; border-radius:10px; border:none;
-  font-size:14px; font-weight:700; font-family:'Noto Sans TC',sans-serif;
-  cursor:pointer; transition:all 0.15s;
+flex:1; padding:12px; border-radius:10px; border:none;
+font-size:14px; font-weight:700; font-family:‘Noto Sans TC’,sans-serif;
+cursor:pointer; transition:all 0.15s;
 }
-.pw-btn-confirm { background:var(--accent); color:#0d0f14; }
+.pw-btn-confirm { background:var(–accent); color:#0d0f14; }
 .pw-btn-cancel { background:#2a3040; color:#7a8399; }
-.pw-error { font-size:12px; color:var(--red); margin-bottom:10px; display:none; }
+.pw-error { font-size:12px; color:var(–red); margin-bottom:10px; display:none; }
 
 /* ===== ADMIN VIEW — Light Luxury Minimal ===== */
 #screen-admin {
-  background:#f7f7f5; color:#1c1c1e; min-height:100vh; display:flex;
+background:#f7f7f5; color:#1c1c1e; min-height:100vh; display:flex;
 }
 .adm-sidebar {
-  width:210px; background:#ffffff;
-  border-right:1px solid #ebebeb;
-  display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100;
-  box-shadow:2px 0 12px rgba(0,0,0,0.04);
+width:210px; background:#ffffff;
+border-right:1px solid #ebebeb;
+display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100;
+box-shadow:2px 0 12px rgba(0,0,0,0.04);
 }
 .adm-logo { padding:24px 20px 18px; border-bottom:1px solid #f0f0ee; }
 .adm-logo-zh { font-size:15px; font-weight:900; color:#1c1c1e; letter-spacing:3px; }
-.adm-logo-sub { font-size:9px; color:#aaa; font-family:'DM Mono',monospace; margin-top:3px; letter-spacing:2px; text-transform:uppercase; }
+.adm-logo-sub { font-size:9px; color:#aaa; font-family:‘DM Mono’,monospace; margin-top:3px; letter-spacing:2px; text-transform:uppercase; }
 .adm-nav { flex:1; padding:14px 12px; overflow-y:auto; }
-.adm-nav-label { font-size:9px; font-family:'DM Mono',monospace; color:#bbb; letter-spacing:2.5px; padding:14px 8px 5px; text-transform:uppercase; }
+.adm-nav-label { font-size:9px; font-family:‘DM Mono’,monospace; color:#bbb; letter-spacing:2.5px; padding:14px 8px 5px; text-transform:uppercase; }
 .adm-nav-item {
-  display:flex; align-items:center; gap:10px; padding:9px 12px;
-  border-radius:9px; cursor:pointer; font-size:13px; color:#888;
-  transition:all 0.15s; margin-bottom:1px; overflow:hidden; white-space:nowrap;
+display:flex; align-items:center; gap:10px; padding:9px 12px;
+border-radius:9px; cursor:pointer; font-size:13px; color:#888;
+transition:all 0.15s; margin-bottom:1px; overflow:hidden; white-space:nowrap;
 }
 .adm-nav-item span:last-child { overflow:hidden; text-overflow:ellipsis; }
 .adm-nav-item:hover { background:#f5f5f3; color:#1c1c1e; }
@@ -109,21 +110,21 @@ body { font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidde
 .adm-nav-item.active .adm-nav-icon { filter:none; }
 .adm-nav-icon { font-size:14px; width:18px; text-align:center; }
 .adm-footer {
-  padding:16px 18px; border-top:1px solid #f0f0ee; font-size:10px; color:#bbb;
-  font-family:'DM Mono',monospace;
+padding:16px 18px; border-top:1px solid #f0f0ee; font-size:10px; color:#bbb;
+font-family:‘DM Mono’,monospace;
 }
-.adm-footer a { color:var(--accent); cursor:pointer; text-decoration:none; }
+.adm-footer a { color:var(–accent); cursor:pointer; text-decoration:none; }
 
 .adm-main { margin-left:210px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
 .adm-topbar {
-  padding:16px 32px; border-bottom:1px solid #ebebeb; background:#ffffff;
-  display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:50;
-  box-shadow:0 1px 8px rgba(0,0,0,0.04);
+padding:16px 32px; border-bottom:1px solid #ebebeb; background:#ffffff;
+display:flex; align-items:center; justify-content:space-between;
+position:sticky; top:0; z-index:50;
+box-shadow:0 1px 8px rgba(0,0,0,0.04);
 }
 .adm-page-title { font-size:17px; font-weight:800; color:#1c1c1e; letter-spacing:-0.3px; }
-.adm-page-title span { color:var(--accent); }
-.adm-date { font-family:'DM Mono',monospace; font-size:11px; color:#aaa; background:#f5f5f3; padding:5px 12px; border-radius:20px; border:1px solid #ebebeb; }
+.adm-page-title span { color:var(–accent); }
+.adm-date { font-family:‘DM Mono’,monospace; font-size:11px; color:#aaa; background:#f5f5f3; padding:5px 12px; border-radius:20px; border:1px solid #ebebeb; }
 
 .adm-content { padding:28px 32px; flex:1; }
 .adm-page { display:none; }
@@ -131,21 +132,21 @@ body { font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidde
 
 /* Cards */
 .card { background:#ffffff; border:1px solid #ebebeb; border-radius:14px; padding:22px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-.card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#aaa; margin-bottom:14px; font-family:'DM Mono',monospace; }
+.card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#aaa; margin-bottom:14px; font-family:‘DM Mono’,monospace; }
 .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
 .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-bottom:16px; }
 .stat-card { background:#ffffff; border:1px solid #ebebeb; border-radius:14px; padding:20px; position:relative; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent); border-radius:14px 14px 0 0; }
+.stat-card::before { content:’’; position:absolute; top:0; left:0; right:0; height:3px; background:var(–accent); border-radius:14px 14px 0 0; }
 .stat-card.green::before { background:#34c759; }
 .stat-card.blue::before { background:#007aff; }
-.stat-label { font-size:10px; color:#aaa; font-family:'DM Mono',monospace; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase; }
-.stat-value { font-size:26px; font-weight:900; font-family:'DM Mono',monospace; color:#1c1c1e; }
+.stat-label { font-size:10px; color:#aaa; font-family:‘DM Mono’,monospace; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase; }
+.stat-value { font-size:26px; font-weight:900; font-family:‘DM Mono’,monospace; color:#1c1c1e; }
 .stat-value small { font-size:13px; font-weight:400; color:#aaa; }
 .stat-sub { font-size:11px; color:#aaa; margin-top:3px; }
 
 /* Table */
 table { width:100%; border-collapse:collapse; }
-th { text-align:left; font-size:10px; font-family:'DM Mono',monospace; color:#bbb; letter-spacing:1.5px; text-transform:uppercase; padding:10px 14px; border-bottom:1.5px solid #f0f0ee; }
+th { text-align:left; font-size:10px; font-family:‘DM Mono’,monospace; color:#bbb; letter-spacing:1.5px; text-transform:uppercase; padding:10px 14px; border-bottom:1.5px solid #f0f0ee; }
 td { padding:12px 14px; font-size:13px; border-bottom:1px solid #f7f7f5; vertical-align:middle; color:#333; }
 tr:last-child td { border-bottom:none; }
 tr:hover td { background:#fafaf8; }
@@ -158,7 +159,7 @@ tr:hover td { background:#fafaf8; }
 .badge-blue { background:#e8f0fe; color:#1a56db; }
 
 /* Button */
-.btn { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; font-family:'Noto Sans TC',sans-serif; }
+.btn { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; font-family:‘Noto Sans TC’,sans-serif; }
 .btn-primary { background:#1c1c1e; color:#fff; }
 .btn-primary:hover { background:#333; }
 .btn-outline { background:#fff; color:#555; border:1px solid #e0e0e0; }
@@ -171,17 +172,17 @@ tr:hover td { background:#fafaf8; }
 /* Form */
 .form-row { display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap; }
 .form-group { display:flex; flex-direction:column; gap:5px; flex:1; min-width:130px; }
-label { font-size:11px; color:#888; font-family:'DM Mono',monospace; letter-spacing:0.3px; }
-input, select, textarea { background:#fafaf8; border:1.5px solid #e8e8e6; border-radius:9px; padding:9px 12px; color:#1c1c1e; font-size:13px; font-family:'Noto Sans TC',sans-serif; outline:none; transition:border-color 0.15s; width:100%; }
+label { font-size:11px; color:#888; font-family:‘DM Mono’,monospace; letter-spacing:0.3px; }
+input, select, textarea { background:#fafaf8; border:1.5px solid #e8e8e6; border-radius:9px; padding:9px 12px; color:#1c1c1e; font-size:13px; font-family:‘Noto Sans TC’,sans-serif; outline:none; transition:border-color 0.15s; width:100%; }
 input:focus, select:focus { border-color:#1c1c1e; background:#fff; }
 select option { background:#fff; color:#1c1c1e; }
 
 /* Clock widget */
 .clock-widget { background:linear-gradient(135deg,#1c1c1e 0%,#2d2d30 100%); border-radius:14px; padding:24px; text-align:center; }
-.clock-time { font-size:44px; font-weight:900; font-family:'DM Mono',monospace; color:#fff; line-height:1; margin-bottom:4px; }
+.clock-time { font-size:44px; font-weight:900; font-family:‘DM Mono’,monospace; color:#fff; line-height:1; margin-bottom:4px; }
 .clock-date { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:18px; }
 .punch-btns { display:flex; gap:10px; justify-content:center; margin-top:12px; }
-.punch-btn { padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:'Noto Sans TC',sans-serif; transition:all 0.15s; }
+.punch-btn { padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; font-family:‘Noto Sans TC’,sans-serif; transition:all 0.15s; }
 .punch-in { background:#34c759; color:#fff; }
 .punch-in:hover { opacity:0.85; }
 .punch-out { background:#ff3b30; color:#fff; }
@@ -189,13 +190,13 @@ select option { background:#fff; color:#1c1c1e; }
 
 /* Salary result */
 .salary-result { background:linear-gradient(135deg,#fffbf0,#fff8e6); border:1.5px solid #ffd98a; border-radius:14px; padding:18px 22px; margin-top:14px; }
-.salary-result-label { font-size:10px; color:#888; font-family:'DM Mono',monospace; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px; }
-.salary-result-value { font-size:32px; font-weight:900; color:#b36e00; font-family:'DM Mono',monospace; }
+.salary-result-label { font-size:10px; color:#888; font-family:‘DM Mono’,monospace; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px; }
+.salary-result-value { font-size:32px; font-weight:900; color:#b36e00; font-family:‘DM Mono’,monospace; }
 .salary-breakdown { margin-top:12px; }
 .breakdown-item { display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #f0ece0; }
 .breakdown-item:last-child { border-bottom:none; }
 .breakdown-label { color:#888; }
-.breakdown-value { font-family:'DM Mono',monospace; font-weight:600; color:#1c1c1e; }
+.breakdown-value { font-family:‘DM Mono’,monospace; font-weight:600; color:#1c1c1e; }
 
 /* Modal */
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; padding:16px; }
@@ -207,8 +208,8 @@ select option { background:#fff; color:#1c1c1e; }
 /* Flex utils */
 .flex-between { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
 .gap-actions { display:flex; gap:6px; }
-.text-mono { font-family:'DM Mono',monospace; }
-.text-accent { color:var(--accent); }
+.text-mono { font-family:‘DM Mono’,monospace; }
+.text-accent { color:var(–accent); }
 .text-green { color:#1a8c3e; }
 .text-red { color:#c0392b; }
 .text-dim { color:#aaa; }
@@ -222,78 +223,78 @@ select option { background:#fff; color:#1c1c1e; }
 
 /* Responsive */
 @media(max-width:700px) {
-  .adm-sidebar { width:52px; }
-  .adm-nav-item span:not(.adm-nav-icon) { display:none; }
-  .adm-nav-label { display:none; }
-  .adm-logo-zh { display:none; }
-  .adm-logo-sub { display:none; }
-  .adm-main { margin-left:52px; }
-  .adm-content { padding:16px; }
-  .adm-topbar { padding:12px 16px; }
-  .grid-3 { grid-template-columns:1fr; }
-  .grid-2 { grid-template-columns:1fr; }
+.adm-sidebar { width:52px; }
+.adm-nav-item span:not(.adm-nav-icon) { display:none; }
+.adm-nav-label { display:none; }
+.adm-logo-zh { display:none; }
+.adm-logo-sub { display:none; }
+.adm-main { margin-left:52px; }
+.adm-content { padding:16px; }
+.adm-topbar { padding:12px 16px; }
+.grid-3 { grid-template-columns:1fr; }
+.grid-2 { grid-template-columns:1fr; }
 }
 
 /* ===== EMPLOYEE VIEW ===== */
 #screen-employee {
-  background:#f4f5f7; color:#1a1d24; min-height:100vh;
+background:#f4f5f7; color:#1a1d24; min-height:100vh;
 }
 .emp-topbar {
-  background:#fff; border-bottom:1px solid #e2e5eb; padding:14px 18px;
-  display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:50;
+background:#fff; border-bottom:1px solid #e2e5eb; padding:14px 18px;
+display:flex; align-items:center; justify-content:space-between;
+position:sticky; top:0; z-index:50;
 }
-.emp-logo { font-size:16px; font-weight:900; color:var(--accent); }
+.emp-logo { font-size:16px; font-weight:900; color:var(–accent); }
 .emp-logo-sub { font-size:10px; color:#6b7280; }
-.emp-name-badge { font-size:12px; background:#fff7ed; color:var(--accent); padding:5px 12px; border-radius:20px; font-weight:600; cursor:pointer; border:1px solid rgba(232,160,32,0.3); }
+.emp-name-badge { font-size:12px; background:#fff7ed; color:var(–accent); padding:5px 12px; border-radius:20px; font-weight:600; cursor:pointer; border:1px solid rgba(232,160,32,0.3); }
 
 .emp-container { max-width:480px; margin:0 auto; padding:16px 14px 60px; }
 
 .emp-tabs { display:flex; background:#fff; border-radius:12px; padding:4px; margin-bottom:18px; border:1px solid #e2e5eb; gap:3px; }
 .emp-tab { flex:1; padding:9px 4px; text-align:center; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; color:#6b7280; transition:all 0.15s; }
-.emp-tab.active { background:var(--accent); color:#fff; }
+.emp-tab.active { background:var(–accent); color:#fff; }
 
-.emp-clock-card { background:linear-gradient(135deg,#1a1d24 0%,#2d3340 100%); border-radius:var(--radius); padding:24px; margin-bottom:14px; text-align:center; }
-.emp-clock-time { font-size:48px; font-weight:900; font-family:'DM Mono',monospace; color:#fff; line-height:1; letter-spacing:2px; }
+.emp-clock-card { background:linear-gradient(135deg,#1a1d24 0%,#2d3340 100%); border-radius:var(–radius); padding:24px; margin-bottom:14px; text-align:center; }
+.emp-clock-time { font-size:48px; font-weight:900; font-family:‘DM Mono’,monospace; color:#fff; line-height:1; letter-spacing:2px; }
 .emp-clock-date { font-size:13px; color:rgba(255,255,255,0.55); margin-top:5px; margin-bottom:20px; }
 .emp-punch-row { display:flex; gap:10px; }
-.emp-punch-btn { flex:1; padding:13px; border-radius:11px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:'Noto Sans TC',sans-serif; transition:all 0.15s; }
+.emp-punch-btn { flex:1; padding:13px; border-radius:11px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:‘Noto Sans TC’,sans-serif; transition:all 0.15s; }
 .emp-punch-btn:active { transform:scale(0.97); }
 .emp-punch-in { background:#16a34a; color:#fff; }
 .emp-punch-out { background:#dc2626; color:#fff; }
 
-.emp-status-card { background:#fff; border-radius:var(--radius); border:1px solid #e2e5eb; padding:14px 18px; margin-bottom:14px; }
+.emp-status-card { background:#fff; border-radius:var(–radius); border:1px solid #e2e5eb; padding:14px 18px; margin-bottom:14px; }
 .emp-status-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; }
 .emp-status-row+.emp-status-row { border-top:1px solid #f0f1f3; }
 .emp-status-key { font-size:13px; color:#6b7280; }
-.emp-status-val { font-size:13px; font-weight:600; font-family:'DM Mono',monospace; }
+.emp-status-val { font-size:13px; font-weight:600; font-family:‘DM Mono’,monospace; }
 .emp-status-val.g { color:#16a34a; }
 .emp-status-val.r { color:#dc2626; }
-.emp-status-val.a { color:var(--accent); }
+.emp-status-val.a { color:var(–accent); }
 
 .emp-section-title { font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:9px; }
 
 .emp-record { background:#fff; border-radius:11px; border:1px solid #e2e5eb; padding:13px 15px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center; }
 .emp-record-date { font-size:13px; font-weight:600; }
-.emp-record-times { font-size:11px; color:#6b7280; font-family:'DM Mono',monospace; margin-top:2px; }
-.emp-record-hrs { font-size:15px; font-weight:700; font-family:'DM Mono',monospace; color:var(--accent); }
+.emp-record-times { font-size:11px; color:#6b7280; font-family:‘DM Mono’,monospace; margin-top:2px; }
+.emp-record-hrs { font-size:15px; font-weight:700; font-family:‘DM Mono’,monospace; color:var(–accent); }
 .emp-record-lbl { font-size:10px; color:#6b7280; text-align:right; }
 
-.emp-salary-big { background:#fff; border-radius:var(--radius); border:2px solid var(--accent); padding:22px; margin-bottom:14px; text-align:center; }
+.emp-salary-big { background:#fff; border-radius:var(–radius); border:2px solid var(–accent); padding:22px; margin-bottom:14px; text-align:center; }
 .emp-salary-big-lbl { font-size:11px; color:#6b7280; margin-bottom:5px; }
-.emp-salary-big-val { font-size:38px; font-weight:900; color:var(--accent); font-family:'DM Mono',monospace; }
+.emp-salary-big-val { font-size:38px; font-weight:900; color:var(–accent); font-family:‘DM Mono’,monospace; }
 .emp-salary-big-month { font-size:12px; color:#6b7280; margin-top:4px; }
 
 .emp-bonus-item { background:#fff; border-radius:11px; border:1px solid #e2e5eb; padding:13px 15px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center; }
 .emp-bonus-name { font-size:13px; font-weight:600; }
 .emp-bonus-client { font-size:11px; color:#6b7280; margin-top:2px; }
-.emp-bonus-amt { font-size:17px; font-weight:900; color:#16a34a; font-family:'DM Mono',monospace; }
+.emp-bonus-amt { font-size:17px; font-weight:900; color:#16a34a; font-family:‘DM Mono’,monospace; }
 .emp-bonus-pending { font-size:13px; font-weight:600; color:#6b7280; }
 
 .emp-month-row { display:flex; gap:9px; margin-bottom:14px; }
-.emp-month-input { flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e5eb; font-size:13px; font-family:'Noto Sans TC',sans-serif; background:#fff; color:#1a1d24; outline:none; }
-.emp-month-input:focus { border-color:var(--accent); }
-.emp-filter-btn { padding:10px 16px; border-radius:10px; background:var(--accent); color:#fff; border:none; font-size:13px; font-weight:600; font-family:'Noto Sans TC',sans-serif; cursor:pointer; }
+.emp-month-input { flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #e2e5eb; font-size:13px; font-family:‘Noto Sans TC’,sans-serif; background:#fff; color:#1a1d24; outline:none; }
+.emp-month-input:focus { border-color:var(–accent); }
+.emp-filter-btn { padding:10px 16px; border-radius:10px; background:var(–accent); color:#fff; border:none; font-size:13px; font-weight:600; font-family:‘Noto Sans TC’,sans-serif; cursor:pointer; }
 
 .emp-empty { text-align:center; padding:32px 16px; color:#6b7280; font-size:13px; }
 .emp-empty-icon { font-size:28px; margin-bottom:8px; }
@@ -305,16 +306,16 @@ select option { background:#fff; color:#1c1c1e; }
 
 /* Responsive */
 @media(max-width:700px) {
-  .adm-sidebar { width:56px; }
-  .adm-nav-item span:not(.adm-nav-icon) { display:none; }
-  .adm-nav-label { display:none; }
-  .adm-logo-zh { display:none; }
-  .adm-logo-sub { display:none; }
-  .adm-main { margin-left:56px; }
-  .adm-content { padding:16px; }
-  .adm-topbar { padding:12px 16px; }
-  .grid-3 { grid-template-columns:1fr; }
-  .grid-2 { grid-template-columns:1fr; }
+.adm-sidebar { width:56px; }
+.adm-nav-item span:not(.adm-nav-icon) { display:none; }
+.adm-nav-label { display:none; }
+.adm-logo-zh { display:none; }
+.adm-logo-sub { display:none; }
+.adm-main { margin-left:56px; }
+.adm-content { padding:16px; }
+.adm-topbar { padding:12px 16px; }
+.grid-3 { grid-template-columns:1fr; }
+.grid-2 { grid-template-columns:1fr; }
 }
 
 .half-pay-toggle { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#888; }
@@ -324,16 +325,18 @@ select option { background:#fff; color:#1c1c1e; }
 .doc-items-row input.qty { max-width:70px; }
 .doc-items-row input.price { max-width:100px; }
 .doc-items-row input.total { max-width:100px; background:#0d0f14 !important; }
-.doc-items-row .del-btn { background:transparent; border:none; color:var(--red); cursor:pointer; font-size:16px; padding:0 4px; flex-shrink:0; }
+.doc-items-row .del-btn { background:transparent; border:none; color:var(–red); cursor:pointer; font-size:16px; padding:0 4px; flex-shrink:0; }
 
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:#2a3040; border-radius:2px; }
 </style>
+
 </head>
 <body>
 
 <!-- ==================== LOGIN ==================== -->
+
 <div id="screen-login">
   <div class="login-logo">
     <div class="login-logo-icon">🚪</div>
@@ -355,6 +358,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- ==================== ADMIN ==================== -->
+
 <div id="screen-admin" class="hidden">
   <aside class="adm-sidebar">
     <div class="adm-logo">
@@ -391,211 +395,215 @@ select option { background:#fff; color:#1c1c1e; }
     </div>
     <div class="adm-content">
 
-      <!-- Dashboard -->
-      <div class="adm-page active" id="adm-dashboard">
-        <div class="grid-3">
-          <div class="stat-card"><div class="stat-label">本月案件</div><div class="stat-value" id="d-orders">0 <small>件</small></div><div class="stat-sub">成交中</div></div>
-          <div class="stat-card green"><div class="stat-label">本月業績</div><div class="stat-value" id="d-revenue">$0</div><div class="stat-sub">已成交</div></div>
-          <div class="stat-card blue"><div class="stat-label">待發獎金</div><div class="stat-value" id="d-bonus">$0</div><div class="stat-sub">已確認</div></div>
-        </div>
-        <div class="grid-2">
-          <div class="card"><div class="card-title">今日出勤</div><table><thead><tr><th>員工</th><th>上班</th><th>下班</th><th>狀態</th></tr></thead><tbody id="d-att"></tbody></table></div>
-          <div class="card"><div class="card-title">最近案件</div><table><thead><tr><th>案件</th><th>業務</th><th>金額</th><th>狀態</th></tr></thead><tbody id="d-orders-tb"></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- Attendance -->
-      <div class="adm-page" id="adm-attendance">
-        <div style="display:flex;gap:16px;align-items:stretch;margin-bottom:16px">
-          <div class="clock-widget" style="width:280px;flex-shrink:0">
-            <div class="clock-time" id="adm-clock">00:00:00</div>
-            <div class="clock-date" id="adm-clock-date">--</div>
-            <select id="punch-staff" style="width:100%;margin-bottom:10px">
-              <option value="">選擇員工</option>
-            </select>
-            <div class="punch-btns">
-              <button class="punch-btn punch-in" onclick="admPunch('in')">▶ 上班</button>
-              <button class="punch-btn punch-out" onclick="admPunch('out')">■ 下班</button>
-            </div>
-          </div>
-          <div class="card" style="flex:1;margin-bottom:0">
-            <div class="flex-between">
-              <div class="card-title" style="margin-bottom:0">打卡記錄</div>
-              <div style="display:flex;gap:8px">
-                <input type="month" id="att-month" style="padding:5px 9px;font-size:12px">
-                <button class="btn btn-outline" style="font-size:11px" onclick="renderAttTable()">篩選</button>
-              </div>
-            </div>
-            <div class="divider"></div>
-            <table><thead><tr><th>員工</th><th>日期</th><th>上班</th><th>下班</th><th>時數</th></tr></thead><tbody id="att-table"></tbody></table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Salary -->
-      <div class="adm-page" id="adm-salary">
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-title">薪資計算</div>
-            <div class="form-row">
-              <div class="form-group"><label>員工</label><select id="sal-staff" onchange="prefillSalary()"><option value="">選擇員工</option></select></div>
-              <div class="form-group"><label>月份</label><input type="month" id="sal-month"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label>薪資類型</label><select id="sal-type" onchange="toggleSalType()"><option value="monthly">固定月薪</option><option value="daily">日薪制</option><option value="hourly">時薪制</option></select></div>
-              <div class="form-group"><label>月薪 / 時薪 (元)</label><input type="number" id="sal-base" oninput="calcSalary()"></div>
-            </div>
-            <div class="form-row hidden" id="sal-hours-row">
-              <div class="form-group"><label>工時 (小時)</label><input type="number" id="sal-hours" oninput="calcSalary()"></div>
-              <div class="form-group"><label>加班時數</label><input type="number" id="sal-ot" placeholder="0" oninput="calcSalary()"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label>獎金 (元)</label><input type="number" id="sal-bonus" placeholder="0" oninput="calcSalary()"></div>
-              <div class="form-group"><label>扣款 (元)</label><input type="number" id="sal-deduct" placeholder="0" oninput="calcSalary()"></div>
-            </div>
-            <button class="btn btn-primary" onclick="calcSalary()" style="width:100%">計算薪資</button>
-            <div class="salary-result hidden" id="salary-result">
-              <div class="salary-result-label">應付薪資</div>
-              <div class="salary-result-value" id="salary-total">$0</div>
-              <div class="salary-breakdown" id="salary-breakdown"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title">薪資記錄</div>
-            <table><thead><tr><th>員工</th><th>月份</th><th>薪資</th><th>狀態</th></tr></thead><tbody id="salary-history"></tbody></table>
-            <div class="mt-4" style="text-align:center">
-              <button class="btn btn-primary" onclick="saveSalary()">💾 儲存本次計算</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Orders -->
-      <div class="adm-page" id="adm-orders">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddOrder()">＋ 新增案件</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>案件名稱</th><th>客戶</th><th>業務</th><th>金額</th><th>成交日</th><th>狀態</th><th>業務獎金</th><th>操作</th></tr></thead><tbody id="orders-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Bonus -->
-      <div class="adm-page" id="adm-bonus">
-        <div class="card">
-          <div class="card-title">業務獎金總覽</div>
-          <table><thead><tr><th>業務</th><th>本月案件</th><th>已確認獎金</th><th>待確認件數</th></tr></thead><tbody id="bonus-overview"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Staff -->
-      <div class="adm-page" id="adm-staff">
-        <div class="flex-between"><div></div><button class="btn btn-primary" onclick="showAddStaff()">＋ 新增人員</button></div>
-        <div class="card">
-          <table><thead><tr><th>姓名</th><th>職位</th><th>類型</th><th>薪資</th><th>狀態</th><th>操作</th></tr></thead><tbody id="staff-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Costs 成本查詢 -->
-      <div class="adm-page" id="adm-costs">
-        <div class="flex-between" style="margin-bottom:16px">
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input type="text" id="cost-search" placeholder="🔍 搜尋產品..." style="padding:8px 12px;font-size:13px;width:180px" oninput="renderCosts()">
-            <select id="cost-supplier" style="padding:8px 11px;font-size:13px" onchange="renderCosts()">
-              <option value="">所有廠商</option>
-            </select>
-            <select id="cost-category" style="padding:8px 11px;font-size:13px" onchange="renderCosts()">
-              <option value="">所有類別</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="showAddCost()">＋ 新增品項</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>廠商</th><th>類別</th><th>品名</th><th>成本</th><th>備註</th><th>操作</th></tr></thead>
-          <tbody id="costs-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Customers 客戶名單 -->
-      <div class="adm-page" id="adm-customers">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddCustomer()">＋ 新增聯絡人</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>聯絡人</th><th>聯絡電話</th><th>統一編號</th><th>地址</th><th>操作</th></tr></thead>
-          <tbody id="customers-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Leaves 請假管理 -->
-      <div class="adm-page" id="adm-leaves">
-        <div class="grid-2" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">高瑋峻 本年特休剩餘</div><div class="stat-value" id="leave-remain">— <small>天</small></div></div>
-          <div class="stat-card green"><div class="stat-label">本月請假天數</div><div class="stat-value" id="leave-month-count">0 <small>天</small></div></div>
-        </div>
-        <div class="card">
-          <div class="flex-between">
-            <div class="card-title" style="margin-bottom:0">請假申請記錄</div>
-          </div>
-          <div class="divider"></div>
-          <table><thead><tr><th>申請人</th><th>假別</th><th>開始日期</th><th>結束日期</th><th>天數</th><th>原因</th><th>狀態</th><th>操作</th></tr></thead>
-          <tbody id="leaves-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Quotes 報價單 -->
-      <div class="adm-page" id="adm-quotes">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddQuote()">＋ 新增報價單</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>單號</th><th>客戶</th><th>施工地點</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>狀態</th><th>操作</th></tr></thead>
-          <tbody id="quotes-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Invoices 請款單 -->
-      <div class="adm-page" id="adm-invoices">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddInvoice()">＋ 新增請款單</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>單號</th><th>聯絡人</th><th>施工地址</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>收款狀態</th><th>操作</th></tr></thead>
-          <tbody id="invoices-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Receivables 應收帳款 -->
-      <div class="adm-page" id="adm-receivables">
-        <div class="flex-between" style="margin-bottom:16px">
-          <div style="display:flex;gap:10px;align-items:center">
-            <input type="month" id="rec-month" style="padding:7px 11px;font-size:13px;background:#1e2430;border:1px solid #2a3040;border-radius:8px;color:#e8eaf0">
-            <button class="btn btn-outline" onclick="renderReceivables()">篩選</button>
-          </div>
-          <button class="btn btn-primary" onclick="showAddReceivable()">＋ 新增帳款</button>
-        </div>
-        <!-- Summary cards -->
-        <div class="grid-3" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">本月未稅合計</div><div class="stat-value" id="rec-pretax">$0</div></div>
-          <div class="stat-card green"><div class="stat-label">本月含稅合計</div><div class="stat-value" id="rec-total">$0</div></div>
-          <div class="stat-card blue"><div class="stat-label">本月淨利</div><div class="stat-value" id="rec-profit">$0</div></div>
-        </div>
-        <div class="card">
-          <table><thead><tr>
-            <th>日期</th><th>客戶</th><th>施工地點</th><th>未稅金額</th><th>稅(5%)</th><th>含稅</th><th>成本</th><th>育正回扣</th><th>瑋峻回扣</th><th>淨利</th><th>操作</th>
-          </tr></thead><tbody id="rec-table"></tbody></table>
-        </div>
-      </div>
-
+```
+  <!-- Dashboard -->
+  <div class="adm-page active" id="adm-dashboard">
+    <div class="grid-3">
+      <div class="stat-card"><div class="stat-label">本月案件</div><div class="stat-value" id="d-orders">0 <small>件</small></div><div class="stat-sub">成交中</div></div>
+      <div class="stat-card green"><div class="stat-label">本月業績</div><div class="stat-value" id="d-revenue">$0</div><div class="stat-sub">已成交</div></div>
+      <div class="stat-card blue"><div class="stat-label">待發獎金</div><div class="stat-value" id="d-bonus">$0</div><div class="stat-sub">已確認</div></div>
     </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">今日出勤</div><table><thead><tr><th>員工</th><th>上班</th><th>下班</th><th>狀態</th></tr></thead><tbody id="d-att"></tbody></table></div>
+      <div class="card"><div class="card-title">最近案件</div><table><thead><tr><th>案件</th><th>業務</th><th>金額</th><th>狀態</th></tr></thead><tbody id="d-orders-tb"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- Attendance -->
+  <div class="adm-page" id="adm-attendance">
+    <div style="display:flex;gap:16px;align-items:stretch;margin-bottom:16px">
+      <div class="clock-widget" style="width:280px;flex-shrink:0">
+        <div class="clock-time" id="adm-clock">00:00:00</div>
+        <div class="clock-date" id="adm-clock-date">--</div>
+        <select id="punch-staff" style="width:100%;margin-bottom:10px">
+          <option value="">選擇員工</option>
+        </select>
+        <div class="punch-btns">
+          <button class="punch-btn punch-in" onclick="admPunch('in')">▶ 上班</button>
+          <button class="punch-btn punch-out" onclick="admPunch('out')">■ 下班</button>
+        </div>
+      </div>
+      <div class="card" style="flex:1;margin-bottom:0">
+        <div class="flex-between">
+          <div class="card-title" style="margin-bottom:0">打卡記錄</div>
+          <div style="display:flex;gap:8px">
+            <input type="month" id="att-month" style="padding:5px 9px;font-size:12px">
+            <button class="btn btn-outline" style="font-size:11px" onclick="renderAttTable()">篩選</button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <table><thead><tr><th>員工</th><th>日期</th><th>上班</th><th>下班</th><th>時數</th></tr></thead><tbody id="att-table"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salary -->
+  <div class="adm-page" id="adm-salary">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">薪資計算</div>
+        <div class="form-row">
+          <div class="form-group"><label>員工</label><select id="sal-staff" onchange="prefillSalary()"><option value="">選擇員工</option></select></div>
+          <div class="form-group"><label>月份</label><input type="month" id="sal-month"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>薪資類型</label><select id="sal-type" onchange="toggleSalType()"><option value="monthly">固定月薪</option><option value="daily">日薪制</option><option value="hourly">時薪制</option></select></div>
+          <div class="form-group"><label>月薪 / 時薪 (元)</label><input type="number" id="sal-base" oninput="calcSalary()"></div>
+        </div>
+        <div class="form-row hidden" id="sal-hours-row">
+          <div class="form-group"><label>工時 (小時)</label><input type="number" id="sal-hours" oninput="calcSalary()"></div>
+          <div class="form-group"><label>加班時數</label><input type="number" id="sal-ot" placeholder="0" oninput="calcSalary()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>獎金 (元)</label><input type="number" id="sal-bonus" placeholder="0" oninput="calcSalary()"></div>
+          <div class="form-group"><label>扣款 (元)</label><input type="number" id="sal-deduct" placeholder="0" oninput="calcSalary()"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcSalary()" style="width:100%">計算薪資</button>
+        <div class="salary-result hidden" id="salary-result">
+          <div class="salary-result-label">應付薪資</div>
+          <div class="salary-result-value" id="salary-total">$0</div>
+          <div class="salary-breakdown" id="salary-breakdown"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">薪資記錄</div>
+        <table><thead><tr><th>員工</th><th>月份</th><th>薪資</th><th>狀態</th></tr></thead><tbody id="salary-history"></tbody></table>
+        <div class="mt-4" style="text-align:center">
+          <button class="btn btn-primary" onclick="saveSalary()">💾 儲存本次計算</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div class="adm-page" id="adm-orders">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddOrder()">＋ 新增案件</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>案件名稱</th><th>客戶</th><th>業務</th><th>金額</th><th>成交日</th><th>狀態</th><th>業務獎金</th><th>操作</th></tr></thead><tbody id="orders-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Bonus -->
+  <div class="adm-page" id="adm-bonus">
+    <div class="card">
+      <div class="card-title">業務獎金總覽</div>
+      <table><thead><tr><th>業務</th><th>本月案件</th><th>已確認獎金</th><th>待確認件數</th></tr></thead><tbody id="bonus-overview"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Staff -->
+  <div class="adm-page" id="adm-staff">
+    <div class="flex-between"><div></div><button class="btn btn-primary" onclick="showAddStaff()">＋ 新增人員</button></div>
+    <div class="card">
+      <table><thead><tr><th>姓名</th><th>職位</th><th>類型</th><th>薪資</th><th>狀態</th><th>操作</th></tr></thead><tbody id="staff-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Costs 成本查詢 -->
+  <div class="adm-page" id="adm-costs">
+    <div class="flex-between" style="margin-bottom:16px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="cost-search" placeholder="🔍 搜尋產品..." style="padding:8px 12px;font-size:13px;width:180px" oninput="renderCosts()">
+        <select id="cost-supplier" style="padding:8px 11px;font-size:13px" onchange="renderCosts()">
+          <option value="">所有廠商</option>
+        </select>
+        <select id="cost-category" style="padding:8px 11px;font-size:13px" onchange="renderCosts()">
+          <option value="">所有類別</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="showAddCost()">＋ 新增品項</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>廠商</th><th>類別</th><th>品名</th><th>成本</th><th>備註</th><th>操作</th></tr></thead>
+      <tbody id="costs-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Customers 客戶名單 -->
+  <div class="adm-page" id="adm-customers">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddCustomer()">＋ 新增聯絡人</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>聯絡人</th><th>聯絡電話</th><th>統一編號</th><th>地址</th><th>操作</th></tr></thead>
+      <tbody id="customers-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Leaves 請假管理 -->
+  <div class="adm-page" id="adm-leaves">
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">高瑋峻 本年特休剩餘</div><div class="stat-value" id="leave-remain">— <small>天</small></div></div>
+      <div class="stat-card green"><div class="stat-label">本月請假天數</div><div class="stat-value" id="leave-month-count">0 <small>天</small></div></div>
+    </div>
+    <div class="card">
+      <div class="flex-between">
+        <div class="card-title" style="margin-bottom:0">請假申請記錄</div>
+      </div>
+      <div class="divider"></div>
+      <table><thead><tr><th>申請人</th><th>假別</th><th>開始日期</th><th>結束日期</th><th>天數</th><th>原因</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="leaves-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Quotes 報價單 -->
+  <div class="adm-page" id="adm-quotes">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddQuote()">＋ 新增報價單</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>單號</th><th>客戶</th><th>施工地點</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="quotes-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Invoices 請款單 -->
+  <div class="adm-page" id="adm-invoices">
+    <div class="flex-between">
+      <div></div>
+      <button class="btn btn-primary" onclick="showAddInvoice()">＋ 新增請款單</button>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>單號</th><th>聯絡人</th><th>施工地址</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>收款狀態</th><th>操作</th></tr></thead>
+      <tbody id="invoices-table"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Receivables 應收帳款 -->
+  <div class="adm-page" id="adm-receivables">
+    <div class="flex-between" style="margin-bottom:16px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="month" id="rec-month" style="padding:7px 11px;font-size:13px;background:#1e2430;border:1px solid #2a3040;border-radius:8px;color:#e8eaf0">
+        <button class="btn btn-outline" onclick="renderReceivables()">篩選</button>
+      </div>
+      <button class="btn btn-primary" onclick="showAddReceivable()">＋ 新增帳款</button>
+    </div>
+    <!-- Summary cards -->
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">本月未稅合計</div><div class="stat-value" id="rec-pretax">$0</div></div>
+      <div class="stat-card green"><div class="stat-label">本月含稅合計</div><div class="stat-value" id="rec-total">$0</div></div>
+      <div class="stat-card blue"><div class="stat-label">本月淨利</div><div class="stat-value" id="rec-profit">$0</div></div>
+    </div>
+    <div class="card">
+      <table><thead><tr>
+        <th>日期</th><th>客戶</th><th>施工地點</th><th>未稅金額</th><th>稅(5%)</th><th>含稅</th><th>成本</th><th>育正回扣</th><th>瑋峻回扣</th><th>淨利</th><th>操作</th>
+      </tr></thead><tbody id="rec-table"></tbody></table>
+    </div>
+  </div>
+
+</div>
+```
+
   </main>
 </div>
 
 <!-- ==================== EMPLOYEE ==================== -->
+
 <div id="screen-employee" class="hidden">
   <div class="emp-topbar">
     <div>
@@ -613,86 +621,89 @@ select option { background:#fff; color:#1c1c1e; }
       </select>
     </div>
 
-    <div class="emp-tabs" id="emp-tabs-container">
-      <div class="emp-tab active" onclick="empSwitchTab('clock')">🕐 打卡</div>
-      <div class="emp-tab" onclick="empSwitchTab('salary')">💰 薪資</div>
-      <div class="emp-tab" onclick="empSwitchTab('bonus')">🎯 獎金</div>
-      <div class="emp-tab hidden" id="emp-leave-tab" onclick="empSwitchTab('leave')">🏖️ 請假</div>
-    </div>
+```
+<div class="emp-tabs" id="emp-tabs-container">
+  <div class="emp-tab active" onclick="empSwitchTab('clock')">🕐 打卡</div>
+  <div class="emp-tab" onclick="empSwitchTab('salary')">💰 薪資</div>
+  <div class="emp-tab" onclick="empSwitchTab('bonus')">🎯 獎金</div>
+  <div class="emp-tab hidden" id="emp-leave-tab" onclick="empSwitchTab('leave')">🏖️ 請假</div>
+</div>
 
-    <!-- Clock tab -->
-    <div id="emp-tab-clock">
-      <div class="emp-clock-card">
-        <div class="emp-clock-time" id="emp-clock">00:00:00</div>
-        <div class="emp-clock-date" id="emp-date">--</div>
-        <div class="emp-punch-row">
-          <button class="emp-punch-btn emp-punch-in" onclick="empPunch('in')">▶ 上班打卡</button>
-          <button class="emp-punch-btn emp-punch-out" onclick="empPunch('out')">■ 下班打卡</button>
-        </div>
-      </div>
-      <div class="emp-status-card">
-        <div class="emp-status-row"><span class="emp-status-key">今日狀態</span><span class="emp-status-val" id="e-today-status">—</span></div>
-        <div class="emp-status-row"><span class="emp-status-key">上班時間</span><span class="emp-status-val g" id="e-today-in">—</span></div>
-        <div class="emp-status-row"><span class="emp-status-key">下班時間</span><span class="emp-status-val r" id="e-today-out">—</span></div>
-        <div class="emp-status-row"><span class="emp-status-key">今日工時</span><span class="emp-status-val a" id="e-today-hrs">—</span></div>
-      </div>
-      <div class="emp-section-title">本月打卡記錄</div>
-      <div id="emp-att-list"><div class="emp-empty"><div class="emp-empty-icon">📋</div>選擇身份後顯示</div></div>
+<!-- Clock tab -->
+<div id="emp-tab-clock">
+  <div class="emp-clock-card">
+    <div class="emp-clock-time" id="emp-clock">00:00:00</div>
+    <div class="emp-clock-date" id="emp-date">--</div>
+    <div class="emp-punch-row">
+      <button class="emp-punch-btn emp-punch-in" onclick="empPunch('in')">▶ 上班打卡</button>
+      <button class="emp-punch-btn emp-punch-out" onclick="empPunch('out')">■ 下班打卡</button>
     </div>
+  </div>
+  <div class="emp-status-card">
+    <div class="emp-status-row"><span class="emp-status-key">今日狀態</span><span class="emp-status-val" id="e-today-status">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">上班時間</span><span class="emp-status-val g" id="e-today-in">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">下班時間</span><span class="emp-status-val r" id="e-today-out">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">今日工時</span><span class="emp-status-val a" id="e-today-hrs">—</span></div>
+  </div>
+  <div class="emp-section-title">本月打卡記錄</div>
+  <div id="emp-att-list"><div class="emp-empty"><div class="emp-empty-icon">📋</div>選擇身份後顯示</div></div>
+</div>
 
-    <!-- Salary tab -->
-    <div id="emp-tab-salary" class="hidden">
-      <div class="emp-month-row">
-        <input type="month" class="emp-month-input" id="emp-sal-month">
-        <button class="emp-filter-btn" onclick="renderEmpSalary()">查詢</button>
-      </div>
-      <div class="emp-salary-big">
-        <div class="emp-salary-big-lbl">本月應領薪資</div>
-        <div class="emp-salary-big-val" id="e-sal-total">—</div>
-        <div class="emp-salary-big-month" id="e-sal-month-lbl">請選擇身份</div>
-      </div>
-      <div class="emp-section-title">薪資明細</div>
-      <div class="emp-status-card" id="e-sal-detail"><div class="emp-empty" style="padding:16px"><div class="emp-empty-icon">💡</div>選擇身份查看明細</div></div>
-    </div>
+<!-- Salary tab -->
+<div id="emp-tab-salary" class="hidden">
+  <div class="emp-month-row">
+    <input type="month" class="emp-month-input" id="emp-sal-month">
+    <button class="emp-filter-btn" onclick="renderEmpSalary()">查詢</button>
+  </div>
+  <div class="emp-salary-big">
+    <div class="emp-salary-big-lbl">本月應領薪資</div>
+    <div class="emp-salary-big-val" id="e-sal-total">—</div>
+    <div class="emp-salary-big-month" id="e-sal-month-lbl">請選擇身份</div>
+  </div>
+  <div class="emp-section-title">薪資明細</div>
+  <div class="emp-status-card" id="e-sal-detail"><div class="emp-empty" style="padding:16px"><div class="emp-empty-icon">💡</div>選擇身份查看明細</div></div>
+</div>
 
-    <!-- Bonus tab -->
-    <div id="emp-tab-bonus" class="hidden">
-      <div class="emp-month-row">
-        <input type="month" class="emp-month-input" id="emp-bon-month">
-        <button class="emp-filter-btn" onclick="renderEmpBonus()">查詢</button>
-      </div>
-      <div class="emp-status-card" style="margin-bottom:14px">
-        <div class="emp-status-row"><span class="emp-status-key">本月成交案件</span><span class="emp-status-val a" id="e-bon-count">—</span></div>
-        <div class="emp-status-row"><span class="emp-status-key">已確認獎金合計</span><span class="emp-status-val g" id="e-bon-total">—</span></div>
-        <div class="emp-status-row"><span class="emp-status-key">待確認案件</span><span class="emp-status-val" id="e-bon-pending">—</span></div>
-      </div>
-      <div class="emp-section-title">案件獎金明細</div>
-      <div id="emp-bonus-list"><div class="emp-empty"><div class="emp-empty-icon">🎯</div>選擇身份查看獎金</div></div>
-    </div>
+<!-- Bonus tab -->
+<div id="emp-tab-bonus" class="hidden">
+  <div class="emp-month-row">
+    <input type="month" class="emp-month-input" id="emp-bon-month">
+    <button class="emp-filter-btn" onclick="renderEmpBonus()">查詢</button>
+  </div>
+  <div class="emp-status-card" style="margin-bottom:14px">
+    <div class="emp-status-row"><span class="emp-status-key">本月成交案件</span><span class="emp-status-val a" id="e-bon-count">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">已確認獎金合計</span><span class="emp-status-val g" id="e-bon-total">—</span></div>
+    <div class="emp-status-row"><span class="emp-status-key">待確認案件</span><span class="emp-status-val" id="e-bon-pending">—</span></div>
+  </div>
+  <div class="emp-section-title">案件獎金明細</div>
+  <div id="emp-bonus-list"><div class="emp-empty"><div class="emp-empty-icon">🎯</div>選擇身份查看獎金</div></div>
+</div>
 
-    <!-- 請假 tab (高瑋峻 only) -->
-    <div id="emp-tab-leave" class="hidden">
-      <div class="emp-status-card" style="margin-bottom:14px">
-        <div class="emp-status-row">
-          <span class="emp-status-key">本年特休剩餘</span>
-          <span class="emp-status-val a" id="emp-leave-remain">— 天</span>
-        </div>
-        <div class="emp-status-row">
-          <span class="emp-status-key">待審核申請</span>
-          <span class="emp-status-val" id="emp-leave-pending">0 件</span>
-        </div>
-      </div>
-      <button class="emp-filter-btn" style="width:100%;margin-bottom:14px;padding:13px;font-size:15px;border:none;cursor:pointer;border-radius:10px" onclick="showAddLeave()">＋ 申請請假</button>
-      <div class="emp-section-title">我的請假記錄</div>
-      <div id="emp-leave-list">
-        <div class="emp-empty"><div class="emp-empty-icon">🏖️</div>尚無請假記錄</div>
-      </div>
+<!-- 請假 tab (高瑋峻 only) -->
+<div id="emp-tab-leave" class="hidden">
+  <div class="emp-status-card" style="margin-bottom:14px">
+    <div class="emp-status-row">
+      <span class="emp-status-key">本年特休剩餘</span>
+      <span class="emp-status-val a" id="emp-leave-remain">— 天</span>
     </div>
+    <div class="emp-status-row">
+      <span class="emp-status-key">待審核申請</span>
+      <span class="emp-status-val" id="emp-leave-pending">0 件</span>
+    </div>
+  </div>
+  <button class="emp-filter-btn" style="width:100%;margin-bottom:14px;padding:13px;font-size:15px;border:none;cursor:pointer;border-radius:10px" onclick="showAddLeave()">＋ 申請請假</button>
+  <div class="emp-section-title">我的請假記錄</div>
+  <div id="emp-leave-list">
+    <div class="emp-empty"><div class="emp-empty-icon">🏖️</div>尚無請假記錄</div>
+  </div>
+</div>
+```
 
   </div>
 </div>
 
 <!-- Modals -->
+
 <div class="modal-overlay" id="modal-order">
   <div class="modal">
     <div class="modal-title">📋 新增案件</div>
@@ -738,6 +749,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Order Edit Modal -->
+
 <div class="modal-overlay" id="modal-order-edit">
   <div class="modal" style="max-width:480px">
     <div class="modal-title">✏️ 編輯案件</div>
@@ -778,6 +790,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Quote Modal -->
+
 <div class="modal-overlay" id="modal-quote">
   <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
     <div class="modal-title" id="quote-modal-title">📄 新增報價單</div>
@@ -819,6 +832,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Invoice Modal -->
+
 <div class="modal-overlay" id="modal-invoice">
   <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
     <div class="modal-title" id="invoice-modal-title">💳 新增請款單</div>
@@ -863,6 +877,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Receivable Modal -->
+
 <div class="modal-overlay" id="modal-receivable">
   <div class="modal" style="max-width:560px">
     <div class="modal-title" id="rec-modal-title">📊 新增帳款</div>
@@ -902,6 +917,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Document Preview Modal (for print/PDF) -->
+
 <div class="modal-overlay" id="modal-doc-preview">
   <div class="modal" style="max-width:700px;max-height:92vh;overflow-y:auto;background:#fff;color:#111">
     <div id="doc-preview-content"></div>
@@ -913,6 +929,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Cost Modal -->
+
 <div class="modal-overlay" id="modal-cost">
   <div class="modal" style="max-width:440px">
     <div class="modal-title" id="cost-modal-title">🔧 新增品項</div>
@@ -940,6 +957,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Customer Modal -->
+
 <div class="modal-overlay" id="modal-customer">
   <div class="modal" style="max-width:440px">
     <div class="modal-title" id="cust-modal-title">👤 新增聯絡人</div>
@@ -960,6 +978,7 @@ select option { background:#fff; color:#1c1c1e; }
 </div>
 
 <!-- Leave Modal (employee applies) -->
+
 <div class="modal-overlay" id="modal-leave">
   <div class="modal" style="max-width:440px">
     <div class="modal-title">🏖️ 請假申請</div>
@@ -2156,6 +2175,7 @@ function printDoc() {
     button { display:none !important; }
   }
 </style>
+
 </head>
 <body>
 <div class="header">
@@ -2582,5 +2602,6 @@ setInterval(()=>{
   const ec=document.getElementById('emp-clock'); if(ec) ec.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
 },1000);
 </script>
+
 </body>
 </html>
