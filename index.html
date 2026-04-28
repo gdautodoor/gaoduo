@@ -326,6 +326,41 @@ select option { background:#fff; color:#1c1c1e; }
 .doc-items-row input.total { max-width:100px; background:#0d0f14 !important; }
 .doc-items-row .del-btn { background:transparent; border:none; color:var(--red); cursor:pointer; font-size:16px; padding:0 4px; flex-shrink:0; }
 
+/* ── Finance styles (奶茶色系) ── */
+.fin-tab {
+  padding:10px 18px; border:none; background:transparent; cursor:pointer;
+  font-size:13px; font-weight:600; color:#9b7e65; font-family:'Noto Sans TC',sans-serif;
+  border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; transition:all 0.15s;
+}
+.fin-tab.active { color:#c17a3a; border-bottom-color:#c17a3a; }
+.fin-tab:hover { color:#c17a3a; background:#fdf0e6; }
+.fin-card {
+  background:#fff; border:1px solid #e8d9c8; border-radius:14px; padding:20px;
+  margin-bottom:16px; box-shadow:0 1px 4px rgba(193,122,58,0.06);
+}
+.fin-card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#b89a78; margin-bottom:14px; font-family:'DM Mono',monospace; }
+.fin-kpi {
+  background:#fff; border:1px solid #e8d9c8; border-radius:14px; padding:18px 20px;
+  box-shadow:0 1px 4px rgba(193,122,58,0.06);
+}
+.fin-kpi-label { font-size:10px; color:#b89a78; font-family:'DM Mono',monospace; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+.fin-kpi-value { font-size:24px; font-weight:900; font-family:'DM Mono',monospace; color:#5c4a35; }
+.fin-kpi-sub { font-size:11px; color:#b89a78; margin-top:3px; }
+.fin-kpi.positive .fin-kpi-value { color:#4a8c5c; }
+.fin-kpi.negative .fin-kpi-value { color:#c0392b; }
+.fin-kpi.amber .fin-kpi-value { color:#c17a3a; }
+.fin-btn-primary { background:#c17a3a; color:#fff; border:none; padding:9px 18px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Noto Sans TC',sans-serif; transition:all 0.15s; }
+.fin-btn-primary:hover { background:#a86530; }
+.fin-alert { padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.fin-alert.good { background:#e8f5ee; color:#1a8c3e; border:1px solid #b0dbbf; }
+.fin-alert.ok { background:#fff8e6; color:#b36e00; border:1px solid #ffd98a; }
+.fin-alert.bad { background:#fdecea; color:#c0392b; border:1px solid #f5c0bb; }
+.fin-bar-wrap { height:8px; background:#f0e6d8; border-radius:4px; overflow:hidden; margin-top:4px; }
+.fin-bar { height:100%; border-radius:4px; transition:width 0.5s ease; }
+#adm-finance table th { color:#b89a78; border-bottom-color:#e8d9c8; }
+#adm-finance table td { border-bottom-color:#f5ede3; color:#5c4a35; }
+#adm-finance table tr:hover td { background:#fdf8f3; }
+
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:#2a3040; border-radius:2px; }
@@ -372,9 +407,7 @@ select option { background:#fff; color:#1c1c1e; }
       <div class="adm-nav-item" onclick="admGoTo('bonus',this)"><span class="adm-nav-icon">🎯</span><span>獎金總覽</span></div>
       <div class="adm-nav-label">財務</div>
       <div class="adm-nav-item" onclick="admGoTo('costs',this)"><span class="adm-nav-icon">🔧</span><span>成本查詢</span></div>
-      <div class="adm-nav-item" onclick="admGoTo('quotes',this)"><span class="adm-nav-icon">📄</span><span>報價單</span></div>
-      <div class="adm-nav-item" onclick="admGoTo('invoices',this)"><span class="adm-nav-icon">💳</span><span>請款單</span></div>
-      <div class="adm-nav-item" onclick="admGoTo('receivables',this)"><span class="adm-nav-icon">📊</span><span>應收帳款</span></div>
+      <div class="adm-nav-item" onclick="admGoTo('finance',this)"><span class="adm-nav-icon">📈</span><span>財務報表</span></div>
       <div class="adm-nav-label">人員</div>
       <div class="adm-nav-item" onclick="admGoTo('staff',this)"><span class="adm-nav-icon">👥</span><span>員工設定</span></div>
       <div class="adm-nav-item" onclick="admGoTo('customers',this)"><span class="adm-nav-icon">👤</span><span>聯絡人名單</span></div>
@@ -517,6 +550,186 @@ select option { background:#fff; color:#1c1c1e; }
         </div>
       </div>
 
+      <!-- Finance 財務報表 -->
+      <div class="adm-page" id="adm-finance" style="background:#fdf8f3;min-height:100vh">
+
+        <!-- Finance sub-tabs -->
+        <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid #e8d9c8;overflow-x:auto">
+          <button class="fin-tab active" onclick="finTab('overview')" id="ftab-overview">📊 總覽</button>
+          <button class="fin-tab" onclick="finTab('revenue')" id="ftab-revenue">💰 營業額</button>
+          <button class="fin-tab" onclick="finTab('purchase')" id="ftab-purchase">📦 進貨</button>
+          <button class="fin-tab" onclick="finTab('salary')" id="ftab-salary">👥 人事</button>
+          <button class="fin-tab" onclick="finTab('expense')" id="ftab-expense">📋 支出</button>
+          <button class="fin-tab" onclick="finTab('report')" id="ftab-report">📈 年度報告</button>
+        </div>
+
+        <!-- ── OVERVIEW ── -->
+        <div id="fin-overview">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+            <select id="ov-year" onchange="renderFinOverview()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+            </select>
+            <select id="ov-month" onchange="renderFinOverview()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+              <option value="">全年</option>
+              <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+              <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+              <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+              <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+            </select>
+          </div>
+          <!-- KPI cards -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" id="ov-kpi-cards"></div>
+          <!-- Charts row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+            <div class="fin-card">
+              <div class="fin-card-title">成本佔比分析</div>
+              <div id="ov-cost-ratio"></div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-card-title">營運狀況警示</div>
+              <div id="ov-alerts"></div>
+            </div>
+          </div>
+          <!-- Monthly breakdown table -->
+          <div class="fin-card">
+            <div class="fin-card-title">月份明細</div>
+            <table><thead><tr>
+              <th>月份</th><th>營業額</th><th>支出</th><th>人事</th><th>進貨</th><th>實賺</th><th>成長率</th>
+            </tr></thead><tbody id="ov-monthly-table"></tbody></table>
+          </div>
+        </div>
+
+        <!-- ── REVENUE ── -->
+        <div id="fin-revenue" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <select id="rev-year" onchange="renderRevenue()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif"></select>
+              <select id="rev-month" onchange="renderRevenue()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+                <option value="">所有月份</option>
+                <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+                <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+                <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+                <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <button class="fin-btn-primary" onclick="showAddRevenue()">＋ 新增營業記錄</button>
+          </div>
+          <!-- Summary -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="rev-summary"></div>
+          <div class="fin-card">
+            <table><thead><tr><th>單號</th><th>日期</th><th>說明</th><th>金額</th><th>操作</th></tr></thead>
+            <tbody id="rev-table"></tbody></table>
+          </div>
+        </div>
+
+        <!-- ── PURCHASE 進貨 ── -->
+        <div id="fin-purchase" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <select id="pur-year" onchange="renderPurchase()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif"></select>
+              <select id="pur-month" onchange="renderPurchase()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+                <option value="">所有月份</option>
+                <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+                <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+                <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+                <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <button class="fin-btn-primary" onclick="showAddPurchase()">＋ 新增進貨</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px" id="pur-summary"></div>
+          <div class="fin-card">
+            <table><thead><tr><th>日期</th><th>項目</th><th>廠商</th><th>金額</th><th>操作</th></tr></thead>
+            <tbody id="pur-table"></tbody></table>
+          </div>
+        </div>
+
+        <!-- ── SALARY 人事 ── -->
+        <div id="fin-salary" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <select id="sal-fin-year" onchange="renderFinSalary()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif"></select>
+              <select id="sal-fin-month" onchange="renderFinSalary()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+                <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+                <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+                <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+                <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <button class="fin-btn-primary" onclick="showAddSalaryEntry()">＋ 新增人員</button>
+          </div>
+          <div class="fin-card" style="margin-bottom:16px">
+            <table><thead><tr><th>姓名</th><th>時薪/日薪</th><th>工時/天數</th><th>薪資</th><th>專案獎金</th><th>合計</th><th>操作</th></tr></thead>
+            <tbody id="sal-fin-table"></tbody>
+            <tfoot><tr style="background:#fdf0e6;font-weight:700">
+              <td colspan="3" style="padding:10px 14px;font-size:13px">薪資總額</td>
+              <td class="text-mono" style="padding:10px 14px" id="sal-fin-total-base">$0</td>
+              <td class="text-mono" style="padding:10px 14px" id="sal-fin-total-bonus">$0</td>
+              <td class="text-mono" style="padding:10px 14px;color:#c17a3a;font-size:15px" id="sal-fin-total">$0</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+          </div>
+        </div>
+
+        <!-- ── EXPENSE 支出 ── -->
+        <div id="fin-expense" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <select id="exp-year" onchange="renderExpense()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif"></select>
+              <select id="exp-month" onchange="renderExpense()" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif">
+                <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+                <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+                <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+                <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <button class="fin-btn-primary" onclick="showAddExpense()">＋ 新增支出</button>
+          </div>
+          <div class="fin-card">
+            <table><thead><tr><th>類別</th><th>說明</th><th>金額</th><th>操作</th></tr></thead>
+            <tbody id="exp-table"></tbody>
+            <tfoot><tr style="background:#fdf0e6;font-weight:700">
+              <td colspan="2" style="padding:10px 14px;font-size:13px">支出合計</td>
+              <td class="text-mono" style="padding:10px 14px;color:#c17a3a;font-size:15px" id="exp-total">$0</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+          </div>
+        </div>
+
+        <!-- ── REPORT 年度報告 ── -->
+        <div id="fin-report" class="hidden">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+            <select id="rpt-year-a" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif" onchange="renderReport()"></select>
+            <span style="color:#9b7e65;font-size:13px">vs</span>
+            <select id="rpt-year-b" style="padding:8px 14px;border-radius:9px;border:1.5px solid #e8d9c8;background:#fff;font-size:13px;color:#5c4a35;font-family:Noto Sans TC,sans-serif" onchange="renderReport()"></select>
+            <span style="color:#9b7e65;font-size:12px">年度比較</span>
+          </div>
+          <!-- Monthly comparison table -->
+          <div class="fin-card" style="margin-bottom:16px">
+            <div class="fin-card-title">月份營收比較</div>
+            <table><thead><tr>
+              <th>月份</th>
+              <th id="rpt-year-a-label">年A 營業額</th>
+              <th id="rpt-year-b-label">年B 營業額</th>
+              <th>成長率</th>
+            </tr></thead><tbody id="rpt-monthly-compare"></tbody>
+            <tfoot><tr style="background:#fdf0e6;font-weight:700">
+              <td style="padding:10px 14px">年度合計</td>
+              <td class="text-mono" style="padding:10px 14px" id="rpt-total-a">$0</td>
+              <td class="text-mono" style="padding:10px 14px" id="rpt-total-b">$0</td>
+              <td class="text-mono" style="padding:10px 14px" id="rpt-total-growth">—</td>
+            </tr></tfoot></table>
+          </div>
+          <!-- Average monthly revenue -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="fin-card" id="rpt-avg-card-a"></div>
+            <div class="fin-card" id="rpt-avg-card-b"></div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- Customers 客戶名單 -->
       <div class="adm-page" id="adm-customers">
         <div class="flex-between">
@@ -542,52 +755,6 @@ select option { background:#fff; color:#1c1c1e; }
           <div class="divider"></div>
           <table><thead><tr><th>申請人</th><th>假別</th><th>開始日期</th><th>結束日期</th><th>天數</th><th>原因</th><th>狀態</th><th>操作</th></tr></thead>
           <tbody id="leaves-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Quotes 報價單 -->
-      <div class="adm-page" id="adm-quotes">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddQuote()">＋ 新增報價單</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>單號</th><th>客戶</th><th>施工地點</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>狀態</th><th>操作</th></tr></thead>
-          <tbody id="quotes-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Invoices 請款單 -->
-      <div class="adm-page" id="adm-invoices">
-        <div class="flex-between">
-          <div></div>
-          <button class="btn btn-primary" onclick="showAddInvoice()">＋ 新增請款單</button>
-        </div>
-        <div class="card">
-          <table><thead><tr><th>單號</th><th>聯絡人</th><th>施工地址</th><th>金額(未稅)</th><th>含稅總計</th><th>日期</th><th>收款狀態</th><th>操作</th></tr></thead>
-          <tbody id="invoices-table"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Receivables 應收帳款 -->
-      <div class="adm-page" id="adm-receivables">
-        <div class="flex-between" style="margin-bottom:16px">
-          <div style="display:flex;gap:10px;align-items:center">
-            <input type="month" id="rec-month" style="padding:7px 11px;font-size:13px;background:#1e2430;border:1px solid #2a3040;border-radius:8px;color:#e8eaf0">
-            <button class="btn btn-outline" onclick="renderReceivables()">篩選</button>
-          </div>
-          <button class="btn btn-primary" onclick="showAddReceivable()">＋ 新增帳款</button>
-        </div>
-        <!-- Summary cards -->
-        <div class="grid-3" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">本月未稅合計</div><div class="stat-value" id="rec-pretax">$0</div></div>
-          <div class="stat-card green"><div class="stat-label">本月含稅合計</div><div class="stat-value" id="rec-total">$0</div></div>
-          <div class="stat-card blue"><div class="stat-label">本月淨利</div><div class="stat-value" id="rec-profit">$0</div></div>
-        </div>
-        <div class="card">
-          <table><thead><tr>
-            <th>日期</th><th>客戶</th><th>施工地點</th><th>未稅金額</th><th>稅(5%)</th><th>含稅</th><th>成本</th><th>育正回扣</th><th>瑋峻回扣</th><th>淨利</th><th>操作</th>
-          </tr></thead><tbody id="rec-table"></tbody></table>
         </div>
       </div>
 
@@ -777,141 +944,6 @@ select option { background:#fff; color:#1c1c1e; }
   </div>
 </div>
 
-<!-- Quote Modal -->
-<div class="modal-overlay" id="modal-quote">
-  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
-    <div class="modal-title" id="quote-modal-title">📄 新增報價單</div>
-    <input type="hidden" id="q-edit-id">
-    <div class="form-row">
-      <div class="form-group"><label>單號</label><input type="text" id="q-no" placeholder="例：Q2603001"></div>
-      <div class="form-group"><label>報價日期</label><input type="date" id="q-date"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>客戶</label>
-        <select id="q-customer" onchange="fillDocCustomer('q')">
-          <option value="">— 選擇聯絡人（或手動輸入）—</option>
-        </select>
-      </div>
-      <div class="form-group"><label>聯絡人</label><input type="text" id="q-contact" placeholder="客戶姓名"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>聯絡電話</label><input type="text" id="q-phone" placeholder="客戶電話"></div>
-      <div class="form-group"><label>統一編號（客戶）</label><input type="text" id="q-taxid" placeholder="選填"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>地址</label><input type="text" id="q-addr" placeholder="施工地址"></div>
-    </div>
-    <div class="card-title" style="margin-top:12px">項目明細</div>
-    <div id="q-items-container"></div>
-    <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="addDocItem('q')">＋ 新增項目</button>
-    <div class="form-row">
-      <div class="form-group"><label>備註1（預設：報價單有效期限60天）</label><input type="text" id="q-note1" value="報價單有效期限:60天"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>備註2（預設：月結30天）</label><input type="text" id="q-note2" value="付款方式:月結30天"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modal-quote')">取消</button>
-      <button class="btn btn-outline" onclick="previewDoc('quote')" style="color:var(--blue);border-color:var(--blue)">👁 預覽 / 列印</button>
-      <button class="btn btn-primary" id="quote-modal-btn" onclick="saveQuote()">儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Invoice Modal -->
-<div class="modal-overlay" id="modal-invoice">
-  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
-    <div class="modal-title" id="invoice-modal-title">💳 新增請款單</div>
-    <input type="hidden" id="i-edit-id">
-    <div class="form-row">
-      <div class="form-group"><label>單號</label><input type="text" id="i-no" placeholder="例：P2603001"></div>
-      <div class="form-group"><label>請款日期</label><input type="date" id="i-date"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>客戶</label>
-        <select id="i-customer" onchange="fillDocCustomer('i')">
-          <option value="">— 選擇聯絡人（或手動輸入）—</option>
-        </select>
-      </div>
-      <div class="form-group"><label>聯絡人</label><input type="text" id="i-contact" placeholder="客戶姓名"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>施工地址</label><input type="text" id="i-addr" placeholder="施工地址"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>統一編號（客戶）</label><input type="text" id="i-taxid" placeholder="選填"></div>
-      <div class="form-group"><label>收款狀態</label>
-        <select id="i-status"><option value="pending">待收款</option><option value="partial">部分收款</option><option value="paid">已收款</option></select>
-      </div>
-    </div>
-    <div class="card-title" style="margin-top:12px">項目明細</div>
-    <div id="i-items-container"></div>
-    <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="addDocItem('i')">＋ 新增項目</button>
-    <div class="form-row">
-      <div class="form-group"><label>匯款帳號</label><input type="text" id="i-bank-no" placeholder="帳號"></div>
-      <div class="form-group"><label>銀行</label><input type="text" id="i-bank-name" placeholder="銀行名稱"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>戶名</label><input type="text" id="i-bank-holder" placeholder="戶名"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modal-invoice')">取消</button>
-      <button class="btn btn-outline" onclick="previewDoc('invoice')" style="color:var(--blue);border-color:var(--blue)">👁 預覽 / 列印</button>
-      <button class="btn btn-primary" id="invoice-modal-btn" onclick="saveInvoice()">儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Receivable Modal -->
-<div class="modal-overlay" id="modal-receivable">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-title" id="rec-modal-title">📊 新增帳款</div>
-    <input type="hidden" id="rec-edit-id">
-    <div class="form-row">
-      <div class="form-group"><label>日期</label><input type="date" id="rec-date"></div>
-      <div class="form-group"><label>客戶名稱</label><input type="text" id="rec-client" placeholder="例：萬澄"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group" style="flex:2"><label>施工地點</label><input type="text" id="rec-site" placeholder="施工地址"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>未稅金額</label><input type="number" id="rec-pretax-val" placeholder="0" oninput="calcRecAuto()"></div>
-      <div class="form-group"><label>成本</label><input type="number" id="rec-cost" placeholder="0" oninput="calcRecAuto()"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>林育正回扣</label><input type="number" id="rec-bonus-lyz" placeholder="0" oninput="calcRecAuto()"></div>
-      <div class="form-group"><label>高瑋峻回扣</label><input type="number" id="rec-bonus-gwj" placeholder="0" oninput="calcRecAuto()"></div>
-    </div>
-    <!-- Auto calc preview -->
-    <div style="background:#1e2430;border-radius:10px;padding:14px;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#7a8399">營業稅(5%)</span><span id="rec-auto-tax" style="font-family:DM Mono,monospace">$0</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#7a8399">含稅金額</span><span id="rec-auto-total" style="font-family:DM Mono,monospace">$0</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span style="color:var(--green)">淨利</span><span id="rec-auto-profit" style="font-family:DM Mono,monospace;color:var(--green)">$0</span></div>
-    </div>
-    <div class="divider"></div>
-    <div style="margin-bottom:8px">
-      <div style="font-size:11px;color:#7a8399;font-family:DM Mono,monospace;letter-spacing:1px;margin-bottom:8px">使用料件（計算成本）</div>
-      <div id="rec-cost-items"></div>
-      <button class="btn btn-outline" style="width:100%;font-size:12px;margin-top:6px" onclick="addRecCostItem()">＋ 新增料件</button>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modal-receivable')">取消</button>
-      <button class="btn btn-primary" onclick="saveReceivable()">儲存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Document Preview Modal (for print/PDF) -->
-<div class="modal-overlay" id="modal-doc-preview">
-  <div class="modal" style="max-width:700px;max-height:92vh;overflow-y:auto;background:#fff;color:#111">
-    <div id="doc-preview-content"></div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #e2e5eb">
-      <button class="btn" style="background:#e2e5eb;color:#333" onclick="closeModal('modal-doc-preview')">關閉</button>
-      <button class="btn btn-primary" id="print-doc-btn" onclick="printDoc()">🖨️ 列印 / 儲存PDF</button>
-    </div>
-  </div>
-</div>
-
 <!-- Cost Modal -->
 <div class="modal-overlay" id="modal-cost">
   <div class="modal" style="max-width:440px">
@@ -1006,6 +1038,8 @@ const ACCOUNTS = {
 };
 // 登入：輸入密碼即可，系統自動對應身份
 
+
+
 // ── 打卡地點設定（200公尺內有效）──
 const PUNCH_LOCATIONS = [
   { name: '公司', lat: 24.16178, lng: 120.68050 },   // 台中市北區崇德路一段121巷2-1號
@@ -1039,7 +1073,7 @@ function loadState() {
       {id:2,name:'林育正',role:'兼職業務',type:'parttime',salType:'monthly',base:0,active:true},
       {id:3,name:'公主',role:'安裝師傅',type:'fulltime',salType:'daily',base:1600,active:true},
     ],
-    attendance:[],orders:[],salaryHistory:[],quotes:[],invoices:[],receivables:[],leaves:[],customers:[],costs:[{"id": 1, "supplier": "金大漢", "category": "自動門主機", "name": "單扇 標準", "cost": 4000, "note": "載重100kg"}, {"id": 2, "supplier": "金大漢", "category": "自動門主機", "name": "雙扇 標準", "cost": 4500, "note": "載重90kg"}, {"id": 3, "supplier": "金大漢", "category": "自動門主機", "name": "K2 單扇", "cost": 6000, "note": "載重120kg"}, {"id": 4, "supplier": "金大漢", "category": "自動門主機", "name": "K2 雙扇", "cost": 7000, "note": "載重100kg"}, {"id": 5, "supplier": "金大漢", "category": "自動門主機", "name": "TH3 單扇", "cost": 9000, "note": "載重150kg"}, {"id": 6, "supplier": "金大漢", "category": "自動門主機", "name": "TH3 雙扇", "cost": 10000, "note": "載重130kg"}, {"id": 7, "supplier": "金大漢", "category": "自動門主機", "name": "AD3 單扇", "cost": 13000, "note": "載重150kg"}, {"id": 8, "supplier": "金大漢", "category": "自動門主機", "name": "AD3 雙扇", "cost": 14000, "note": "載重130kg"}, {"id": 9, "supplier": "金大漢", "category": "自動門主機", "name": "H5 單扇", "cost": 14000, "note": "載重250kg"}, {"id": 10, "supplier": "金大漢", "category": "自動門主機", "name": "H5 雙扇", "cost": 16000, "note": "載重200kg"}, {"id": 11, "supplier": "金大漢", "category": "感應器", "name": "紅外線感應 x1", "cost": 850, "note": ""}, {"id": 12, "supplier": "金大漢", "category": "感應器", "name": "紅外線感應 x10", "cost": 800, "note": ""}, {"id": 13, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x1", "cost": 1400, "note": ""}, {"id": 14, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x10", "cost": 1000, "note": ""}, {"id": 15, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x30", "cost": 950, "note": ""}, {"id": 16, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x1", "cost": 1100, "note": ""}, {"id": 17, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x10", "cost": 1050, "note": ""}, {"id": 18, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x30", "cost": 1000, "note": ""}, {"id": 19, "supplier": "金大漢", "category": "配件", "name": "集線器 x1", "cost": 500, "note": ""}, {"id": 20, "supplier": "金大漢", "category": "配件", "name": "集線器 x10", "cost": 450, "note": ""}, {"id": 21, "supplier": "金大漢", "category": "配件", "name": "陽極鎖 x1", "cost": 1700, "note": ""}, {"id": 22, "supplier": "金大漢", "category": "配件", "name": "陽極鎖 x10", "cost": 1600, "note": ""}, {"id": 23, "supplier": "金大漢", "category": "配件", "name": "遙控器 x1", "cost": 950, "note": "單顆400"}, {"id": 24, "supplier": "金大漢", "category": "配件", "name": "輪子 x1", "cost": 100, "note": ""}, {"id": 25, "supplier": "金大漢", "category": "配件", "name": "輪子 x100", "cost": 60, "note": ""}, {"id": 26, "supplier": "金大漢", "category": "配件", "name": "紅外線線", "cost": 150, "note": ""}, {"id": 27, "supplier": "金大漢", "category": "配件", "name": "皮帶 一米", "cost": 100, "note": ""}, {"id": 28, "supplier": "金大漢", "category": "配件", "name": "叮咚", "cost": 1000, "note": ""}, {"id": 29, "supplier": "金大漢", "category": "配件", "name": "三秒延遲", "cost": 650, "note": ""}, {"id": 30, "supplier": "金大漢", "category": "配件", "name": "有線感應", "cost": 250, "note": ""}, {"id": 31, "supplier": "金大漢", "category": "軌道", "name": "150KG 1米", "cost": 750, "note": ""}, {"id": 32, "supplier": "金大漢", "category": "軌道", "name": "150KG 2米", "cost": 1500, "note": ""}, {"id": 33, "supplier": "金大漢", "category": "軌道", "name": "150KG 3米", "cost": 1950, "note": ""}, {"id": 34, "supplier": "金大漢", "category": "軌道", "name": "150KG 4米", "cost": 2600, "note": ""}, {"id": 35, "supplier": "金大漢", "category": "軌道", "name": "150KG 5米", "cost": 3250, "note": ""}, {"id": 36, "supplier": "金大漢", "category": "軌道", "name": "150KG 6米", "cost": 3900, "note": ""}, {"id": 37, "supplier": "金大漢", "category": "軌道", "name": "150KG 蓋 1米", "cost": 350, "note": ""}, {"id": 38, "supplier": "金大漢", "category": "軌道", "name": "150KG 含蓋 1米", "cost": 1100, "note": ""}, {"id": 39, "supplier": "金大漢", "category": "軌道", "name": "250KG 1米", "cost": 1000, "note": ""}, {"id": 40, "supplier": "金大漢", "category": "軌道", "name": "250KG 2米", "cost": 2000, "note": ""}, {"id": 41, "supplier": "金大漢", "category": "軌道", "name": "250KG 3米", "cost": 3000, "note": ""}, {"id": 42, "supplier": "金大漢", "category": "軌道", "name": "250KG 4米", "cost": 4000, "note": ""}, {"id": 43, "supplier": "金大漢", "category": "軌道", "name": "250KG 5米", "cost": 5000, "note": ""}, {"id": 44, "supplier": "金大漢", "category": "軌道", "name": "250KG 6米", "cost": 6000, "note": ""}, {"id": 45, "supplier": "金大漢", "category": "90度門", "name": "SW-2 外掛", "cost": 23000, "note": "200kg"}, {"id": 46, "supplier": "金大漢", "category": "90度門", "name": "SW-5 外掛", "cost": 38000, "note": "400kg"}, {"id": 47, "supplier": "金大漢", "category": "90度門", "name": "IW-3 內坎", "cost": 42000, "note": ""}, {"id": 48, "supplier": "金大漢", "category": "90度門", "name": "IW-6 內坎", "cost": 62000, "note": ""}, {"id": 49, "supplier": "金大漢", "category": "雙扇跑單", "name": "L2-W2", "cost": 13000, "note": ""}, {"id": 50, "supplier": "金大漢", "category": "雙扇跑單", "name": "K2-W2", "cost": 15000, "note": ""}, {"id": 51, "supplier": "金大漢", "category": "雙扇跑單", "name": "TH3-W2", "cost": 18000, "note": ""}, {"id": 52, "supplier": "金大漢", "category": "雙扇跑單", "name": "AD3-W2", "cost": 21000, "note": ""}, {"id": 53, "supplier": "金大漢", "category": "雙扇跑單", "name": "H5-W2", "cost": 22000, "note": ""}, {"id": 54, "supplier": "金大漢", "category": "三重門", "name": "TH3-W3", "cost": 29000, "note": ""}, {"id": 55, "supplier": "金大漢", "category": "三重門", "name": "AD3-W3", "cost": 32000, "note": ""}, {"id": 56, "supplier": "金大漢", "category": "三重門", "name": "H5-W3", "cost": 33000, "note": ""}, {"id": 57, "supplier": "金大漢", "category": "配件", "name": "腳踢開關", "cost": 5000, "note": ""}, {"id": 58, "supplier": "金大漢", "category": "配件", "name": "UBS", "cost": 2800, "note": ""}, {"id": 59, "supplier": "東洋", "category": "自動門主機", "name": "268-1 110V", "cost": 3500, "note": ""}, {"id": 60, "supplier": "東洋", "category": "自動門主機", "name": "268-1 220V", "cost": 3600, "note": ""}, {"id": 61, "supplier": "東洋", "category": "自動門主機", "name": "268-2 110V", "cost": 3800, "note": ""}, {"id": 62, "supplier": "東洋", "category": "自動門主機", "name": "268-2 220V", "cost": 3900, "note": ""}, {"id": 63, "supplier": "東洋", "category": "自動門主機", "name": "368-1 全電壓", "cost": 4800, "note": ""}, {"id": 64, "supplier": "東洋", "category": "自動門主機", "name": "368-2 全電壓", "cost": 5600, "note": ""}, {"id": 65, "supplier": "東洋", "category": "配件", "name": "7孔片", "cost": 50, "note": "一包"}, {"id": 66, "supplier": "東洋", "category": "配件", "name": "輪子", "cost": 80, "note": "一顆"}, {"id": 67, "supplier": "東洋", "category": "配件", "name": "控制盤", "cost": 1500, "note": ""}, {"id": 68, "supplier": "東洋", "category": "配件", "name": "馬達", "cost": 1500, "note": ""}, {"id": 69, "supplier": "東洋", "category": "配件", "name": "皮帶 一米", "cost": 50, "note": ""}, {"id": 70, "supplier": "東洋", "category": "配件", "name": "連動門配件", "cost": 3500, "note": "2米軌道"}, {"id": 71, "supplier": "東洋", "category": "配件", "name": "小軌道 一米", "cost": 500, "note": ""}, {"id": 72, "supplier": "東洋", "category": "自動門主機", "name": "450 單扇", "cost": 7000, "note": ""}, {"id": 73, "supplier": "東洋", "category": "自動門主機", "name": "450 雙扇", "cost": 8000, "note": ""}, {"id": 74, "supplier": "東洋", "category": "自動門主機", "name": "450加重", "cost": 9500, "note": ""}, {"id": 75, "supplier": "東洋", "category": "自動門主機", "name": "無塵機器", "cost": 3500, "note": ""}, {"id": 76, "supplier": "東洋", "category": "自動門主機", "name": "重型388 單", "cost": 4700, "note": ""}, {"id": 77, "supplier": "東洋", "category": "自動門主機", "name": "重型388 雙", "cost": 5800, "note": ""}, {"id": 78, "supplier": "東洋", "category": "配件", "name": "無塵皮帶 10米", "cost": 1400, "note": "一米140"}, {"id": 79, "supplier": "東洋", "category": "配件", "name": "無塵皮帶 8米", "cost": 1120, "note": ""}, {"id": 80, "supplier": "東洋", "category": "配件", "name": "軌道輪子組", "cost": 1140, "note": ""}, {"id": 81, "supplier": "東洋", "category": "配件", "name": "雙扇墊", "cost": 80, "note": ""}, {"id": 82, "supplier": "東洋", "category": "配件", "name": "450控制盤", "cost": 3000, "note": ""}, {"id": 83, "supplier": "東洋", "category": "自動門主機", "name": "無塵單 110V", "cost": 3500, "note": ""}, {"id": 84, "supplier": "東洋", "category": "自動門主機", "name": "無塵單 220V", "cost": 3600, "note": ""}, {"id": 85, "supplier": "東洋", "category": "自動門主機", "name": "無塵雙 110V", "cost": 3800, "note": ""}, {"id": 86, "supplier": "東洋", "category": "自動門主機", "name": "無塵雙 220V", "cost": 3900, "note": ""}, {"id": 87, "supplier": "東洋", "category": "自動門主機", "name": "無塵重單", "cost": 5100, "note": ""}, {"id": 88, "supplier": "東洋", "category": "自動門主機", "name": "無塵重雙", "cost": 5900, "note": ""}, {"id": 89, "supplier": "東洋", "category": "配件", "name": "368控制盤 全電壓", "cost": 2400, "note": ""}, {"id": 90, "supplier": "東洋", "category": "配件", "name": "齒型馬達", "cost": 1900, "note": ""}, {"id": 91, "supplier": "東洋", "category": "配件", "name": "一般馬達", "cost": 1700, "note": ""}, {"id": 92, "supplier": "鵬驥", "category": "門鎖", "name": "電鎖", "cost": 1550, "note": ""}, {"id": 93, "supplier": "鵬驥", "category": "門鎖", "name": "磁力鎖", "cost": 1150, "note": ""}, {"id": 94, "supplier": "鵬驥", "category": "配件", "name": "繼電器", "cost": 50, "note": ""}, {"id": 95, "supplier": "鵬驥", "category": "門鎖", "name": "陽極鎖", "cost": 900, "note": ""}, {"id": 96, "supplier": "鵬驥", "category": "配件", "name": "外掛盒64", "cost": 550, "note": ""}, {"id": 97, "supplier": "鵬驥", "category": "密碼機", "name": "PP-87N", "cost": 900, "note": ""}, {"id": 98, "supplier": "鵬驥", "category": "密碼機", "name": "PG-105K", "cost": 170, "note": ""}, {"id": 99, "supplier": "鵬驥", "category": "配件", "name": "美規變壓器", "cost": 170, "note": ""}, {"id": 100, "supplier": "鵬驥", "category": "配件", "name": "磁扣", "cost": 50, "note": ""}, {"id": 101, "supplier": "日懋", "category": "感應手感", "name": "壓感 小", "cost": 300, "note": ""}, {"id": 102, "supplier": "日懋", "category": "感應手感", "name": "壓感 中", "cost": 400, "note": ""}, {"id": 103, "supplier": "日懋", "category": "感應手感", "name": "壓感 大", "cost": 500, "note": ""}, {"id": 104, "supplier": "日懋", "category": "感應手感", "name": "磁力鎖", "cost": 1300, "note": ""}, {"id": 105, "supplier": "日懋", "category": "感應手感", "name": "時間控制", "cost": 1500, "note": ""}, {"id": 106, "supplier": "日懋", "category": "感應手感", "name": "內推感應", "cost": 600, "note": ""}, {"id": 107, "supplier": "日懋", "category": "感應手感", "name": "外拉感應", "cost": 400, "note": ""}, {"id": 108, "supplier": "日懋", "category": "遙控器", "name": "SR-160", "cost": 1000, "note": ""}, {"id": 109, "supplier": "日懋", "category": "遙控器", "name": "手感線", "cost": 50, "note": ""}, {"id": 110, "supplier": "賀多龍", "category": "自動門主機", "name": "75DC", "cost": 3600, "note": ""}, {"id": 111, "supplier": "賀多龍", "category": "配件", "name": "輪子", "cost": 150, "note": ""}, {"id": 112, "supplier": "賀多龍", "category": "配件", "name": "圓溝輪", "cost": 140, "note": ""}, {"id": 113, "supplier": "賀多龍", "category": "配件", "name": "軸承", "cost": 50, "note": ""}, {"id": 114, "supplier": "賀多龍", "category": "配件", "name": "黑色輪子", "cost": 160, "note": ""}, {"id": 115, "supplier": "上格", "category": "軌道", "name": "一米", "cost": 800, "note": ""}, {"id": 116, "supplier": "上格", "category": "軌道", "name": "底一米", "cost": 600, "note": ""}, {"id": 117, "supplier": "上格", "category": "軌道", "name": "蓋一米", "cost": 200, "note": ""}, {"id": 118, "supplier": "九龍", "category": "防火門", "name": "黃冠防火門弓", "cost": 12500, "note": ""}, {"id": 119, "supplier": "九龍", "category": "防火門", "name": "防火門弓 4號", "cost": 1000, "note": ""}, {"id": 120, "supplier": "九龍", "category": "防火門", "name": "防火門弓 5號", "cost": 1200, "note": ""}, {"id": 121, "supplier": "九龍", "category": "空氣門", "name": "空氣門 一般", "cost": 5200, "note": ""}, {"id": 122, "supplier": "九龍", "category": "空氣門", "name": "空氣門 重型", "cost": 5700, "note": ""}, {"id": 123, "supplier": "九龍", "category": "空氣門", "name": "空氣門 連動 一米", "cost": 900, "note": ""}, {"id": 124, "supplier": "九龍", "category": "空氣門", "name": "90度空氣門", "cost": 18500, "note": ""}, {"id": 125, "supplier": "九龍", "category": "手拉門", "name": "手拉門軌 一米", "cost": 1600, "note": ""}, {"id": 126, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 210cm", "cost": 25000, "note": "125kg"}, {"id": 127, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 250cm", "cost": 28000, "note": ""}, {"id": 128, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 300cm", "cost": 33000, "note": ""}, {"id": 129, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 90度", "cost": 18500, "note": ""}, {"id": 130, "supplier": "議晨", "category": "磁浮門", "name": "黑色90度磁浮門", "cost": 25000, "note": ""}, {"id": 131, "supplier": "議晨", "category": "磁浮門", "name": "陽極鎖", "cost": 1800, "note": ""}, {"id": 132, "supplier": "議晨", "category": "磁浮門", "name": "外掛盒", "cost": 980, "note": ""}, {"id": 133, "supplier": "議晨", "category": "磁浮門", "name": "遙控器", "cost": 1920, "note": ""}, {"id": 134, "supplier": "議晨", "category": "磁浮門", "name": "遙控發射 白色", "cost": 480, "note": ""}, {"id": 135, "supplier": "議晨", "category": "磁浮門", "name": "遙控器 單顆", "cost": 250, "note": ""}],
+    attendance:[],orders:[],salaryHistory:[],finance:{revenues:[],purchases:[],expenses:[],salaries:[]},quotes:[],invoices:[],receivables:[],leaves:[],customers:[],costs:[{"id": 1, "supplier": "金大漢", "category": "自動門主機", "name": "單扇 標準", "cost": 4000, "note": "載重100kg"}, {"id": 2, "supplier": "金大漢", "category": "自動門主機", "name": "雙扇 標準", "cost": 4500, "note": "載重90kg"}, {"id": 3, "supplier": "金大漢", "category": "自動門主機", "name": "K2 單扇", "cost": 6000, "note": "載重120kg"}, {"id": 4, "supplier": "金大漢", "category": "自動門主機", "name": "K2 雙扇", "cost": 7000, "note": "載重100kg"}, {"id": 5, "supplier": "金大漢", "category": "自動門主機", "name": "TH3 單扇", "cost": 9000, "note": "載重150kg"}, {"id": 6, "supplier": "金大漢", "category": "自動門主機", "name": "TH3 雙扇", "cost": 10000, "note": "載重130kg"}, {"id": 7, "supplier": "金大漢", "category": "自動門主機", "name": "AD3 單扇", "cost": 13000, "note": "載重150kg"}, {"id": 8, "supplier": "金大漢", "category": "自動門主機", "name": "AD3 雙扇", "cost": 14000, "note": "載重130kg"}, {"id": 9, "supplier": "金大漢", "category": "自動門主機", "name": "H5 單扇", "cost": 14000, "note": "載重250kg"}, {"id": 10, "supplier": "金大漢", "category": "自動門主機", "name": "H5 雙扇", "cost": 16000, "note": "載重200kg"}, {"id": 11, "supplier": "金大漢", "category": "感應器", "name": "紅外線感應 x1", "cost": 850, "note": ""}, {"id": 12, "supplier": "金大漢", "category": "感應器", "name": "紅外線感應 x10", "cost": 800, "note": ""}, {"id": 13, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x1", "cost": 1400, "note": ""}, {"id": 14, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x10", "cost": 1000, "note": ""}, {"id": 15, "supplier": "金大漢", "category": "感應器", "name": "觸摸感應 x30", "cost": 950, "note": ""}, {"id": 16, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x1", "cost": 1100, "note": ""}, {"id": 17, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x10", "cost": 1050, "note": ""}, {"id": 18, "supplier": "金大漢", "category": "感應器", "name": "貓眼 x30", "cost": 1000, "note": ""}, {"id": 19, "supplier": "金大漢", "category": "配件", "name": "集線器 x1", "cost": 500, "note": ""}, {"id": 20, "supplier": "金大漢", "category": "配件", "name": "集線器 x10", "cost": 450, "note": ""}, {"id": 21, "supplier": "金大漢", "category": "配件", "name": "陽極鎖 x1", "cost": 1700, "note": ""}, {"id": 22, "supplier": "金大漢", "category": "配件", "name": "陽極鎖 x10", "cost": 1600, "note": ""}, {"id": 23, "supplier": "金大漢", "category": "配件", "name": "遙控器 x1", "cost": 950, "note": "單顆400"}, {"id": 24, "supplier": "金大漢", "category": "配件", "name": "輪子 x1", "cost": 100, "note": ""}, {"id": 25, "supplier": "金大漢", "category": "配件", "name": "輪子 x100", "cost": 60, "note": ""}, {"id": 26, "supplier": "金大漢", "category": "配件", "name": "紅外線線", "cost": 150, "note": ""}, {"id": 27, "supplier": "金大漢", "category": "配件", "name": "皮帶 一米", "cost": 100, "note": ""}, {"id": 28, "supplier": "金大漢", "category": "配件", "name": "叮咚", "cost": 1000, "note": ""}, {"id": 29, "supplier": "金大漢", "category": "配件", "name": "三秒延遲", "cost": 650, "note": ""}, {"id": 30, "supplier": "金大漢", "category": "配件", "name": "有線感應", "cost": 250, "note": ""}, {"id": 31, "supplier": "金大漢", "category": "軌道", "name": "150KG 1米", "cost": 750, "note": ""}, {"id": 32, "supplier": "金大漢", "category": "軌道", "name": "150KG 2米", "cost": 1500, "note": ""}, {"id": 33, "supplier": "金大漢", "category": "軌道", "name": "150KG 3米", "cost": 1950, "note": ""}, {"id": 34, "supplier": "金大漢", "category": "軌道", "name": "150KG 4米", "cost": 2600, "note": ""}, {"id": 35, "supplier": "金大漢", "category": "軌道", "name": "150KG 5米", "cost": 3250, "note": ""}, {"id": 36, "supplier": "金大漢", "category": "軌道", "name": "150KG 6米", "cost": 3900, "note": ""}, {"id": 37, "supplier": "金大漢", "category": "軌道", "name": "150KG 蓋 1米", "cost": 350, "note": ""}, {"id": 38, "supplier": "金大漢", "category": "軌道", "name": "150KG 含蓋 1米", "cost": 1100, "note": ""}, {"id": 39, "supplier": "金大漢", "category": "軌道", "name": "250KG 1米", "cost": 1000, "note": ""}, {"id": 40, "supplier": "金大漢", "category": "軌道", "name": "250KG 2米", "cost": 2000, "note": ""}, {"id": 41, "supplier": "金大漢", "category": "軌道", "name": "250KG 3米", "cost": 3000, "note": ""}, {"id": 42, "supplier": "金大漢", "category": "軌道", "name": "250KG 4米", "cost": 4000, "note": ""}, {"id": 43, "supplier": "金大漢", "category": "軌道", "name": "250KG 5米", "cost": 5000, "note": ""}, {"id": 44, "supplier": "金大漢", "category": "軌道", "name": "250KG 6米", "cost": 6000, "note": ""}, {"id": 45, "supplier": "金大漢", "category": "90度門", "name": "SW-2 外掛", "cost": 23000, "note": "200kg"}, {"id": 46, "supplier": "金大漢", "category": "90度門", "name": "SW-5 外掛", "cost": 38000, "note": "400kg"}, {"id": 47, "supplier": "金大漢", "category": "90度門", "name": "IW-3 內坎", "cost": 42000, "note": ""}, {"id": 48, "supplier": "金大漢", "category": "90度門", "name": "IW-6 內坎", "cost": 62000, "note": ""}, {"id": 49, "supplier": "金大漢", "category": "雙扇跑單", "name": "L2-W2", "cost": 13000, "note": ""}, {"id": 50, "supplier": "金大漢", "category": "雙扇跑單", "name": "K2-W2", "cost": 15000, "note": ""}, {"id": 51, "supplier": "金大漢", "category": "雙扇跑單", "name": "TH3-W2", "cost": 18000, "note": ""}, {"id": 52, "supplier": "金大漢", "category": "雙扇跑單", "name": "AD3-W2", "cost": 21000, "note": ""}, {"id": 53, "supplier": "金大漢", "category": "雙扇跑單", "name": "H5-W2", "cost": 22000, "note": ""}, {"id": 54, "supplier": "金大漢", "category": "三重門", "name": "TH3-W3", "cost": 29000, "note": ""}, {"id": 55, "supplier": "金大漢", "category": "三重門", "name": "AD3-W3", "cost": 32000, "note": ""}, {"id": 56, "supplier": "金大漢", "category": "三重門", "name": "H5-W3", "cost": 33000, "note": ""}, {"id": 57, "supplier": "金大漢", "category": "配件", "name": "腳踢開關", "cost": 5000, "note": ""}, {"id": 58, "supplier": "金大漢", "category": "配件", "name": "UBS", "cost": 2800, "note": ""}, {"id": 59, "supplier": "東洋", "category": "自動門主機", "name": "268-1 110V", "cost": 3500, "note": ""}, {"id": 60, "supplier": "東洋", "category": "自動門主機", "name": "268-1 220V", "cost": 3600, "note": ""}, {"id": 61, "supplier": "東洋", "category": "自動門主機", "name": "268-2 110V", "cost": 3800, "note": ""}, {"id": 62, "supplier": "東洋", "category": "自動門主機", "name": "268-2 220V", "cost": 3900, "note": ""}, {"id": 63, "supplier": "東洋", "category": "自動門主機", "name": "368-1 全電壓", "cost": 4800, "note": ""}, {"id": 64, "supplier": "東洋", "category": "自動門主機", "name": "368-2 全電壓", "cost": 5600, "note": ""}, {"id": 65, "supplier": "東洋", "category": "配件", "name": "7孔片", "cost": 50, "note": "一包"}, {"id": 66, "supplier": "東洋", "category": "配件", "name": "輪子", "cost": 80, "note": "一顆"}, {"id": 67, "supplier": "東洋", "category": "配件", "name": "控制盤", "cost": 1500, "note": ""}, {"id": 68, "supplier": "東洋", "category": "配件", "name": "馬達", "cost": 1500, "note": ""}, {"id": 69, "supplier": "東洋", "category": "配件", "name": "皮帶 一米", "cost": 50, "note": ""}, {"id": 70, "supplier": "東洋", "category": "配件", "name": "連動門配件", "cost": 3500, "note": "2米軌道"}, {"id": 71, "supplier": "東洋", "category": "配件", "name": "小軌道 一米", "cost": 500, "note": ""}, {"id": 72, "supplier": "東洋", "category": "自動門主機", "name": "450 單扇", "cost": 7000, "note": ""}, {"id": 73, "supplier": "東洋", "category": "自動門主機", "name": "450 雙扇", "cost": 8000, "note": ""}, {"id": 74, "supplier": "東洋", "category": "自動門主機", "name": "450加重", "cost": 9500, "note": ""}, {"id": 75, "supplier": "東洋", "category": "自動門主機", "name": "無塵機器", "cost": 3500, "note": ""}, {"id": 76, "supplier": "東洋", "category": "自動門主機", "name": "重型388 單", "cost": 4700, "note": ""}, {"id": 77, "supplier": "東洋", "category": "自動門主機", "name": "重型388 雙", "cost": 5800, "note": ""}, {"id": 78, "supplier": "東洋", "category": "配件", "name": "無塵皮帶 10米", "cost": 1400, "note": "一米140"}, {"id": 79, "supplier": "東洋", "category": "配件", "name": "無塵皮帶 8米", "cost": 1120, "note": ""}, {"id": 80, "supplier": "東洋", "category": "配件", "name": "軌道輪子組", "cost": 1140, "note": ""}, {"id": 81, "supplier": "東洋", "category": "配件", "name": "雙扇墊", "cost": 80, "note": ""}, {"id": 82, "supplier": "東洋", "category": "配件", "name": "450控制盤", "cost": 3000, "note": ""}, {"id": 83, "supplier": "東洋", "category": "自動門主機", "name": "無塵單 110V", "cost": 3500, "note": ""}, {"id": 84, "supplier": "東洋", "category": "自動門主機", "name": "無塵單 220V", "cost": 3600, "note": ""}, {"id": 85, "supplier": "東洋", "category": "自動門主機", "name": "無塵雙 110V", "cost": 3800, "note": ""}, {"id": 86, "supplier": "東洋", "category": "自動門主機", "name": "無塵雙 220V", "cost": 3900, "note": ""}, {"id": 87, "supplier": "東洋", "category": "自動門主機", "name": "無塵重單", "cost": 5100, "note": ""}, {"id": 88, "supplier": "東洋", "category": "自動門主機", "name": "無塵重雙", "cost": 5900, "note": ""}, {"id": 89, "supplier": "東洋", "category": "配件", "name": "368控制盤 全電壓", "cost": 2400, "note": ""}, {"id": 90, "supplier": "東洋", "category": "配件", "name": "齒型馬達", "cost": 1900, "note": ""}, {"id": 91, "supplier": "東洋", "category": "配件", "name": "一般馬達", "cost": 1700, "note": ""}, {"id": 92, "supplier": "鵬驥", "category": "門鎖", "name": "電鎖", "cost": 1550, "note": ""}, {"id": 93, "supplier": "鵬驥", "category": "門鎖", "name": "磁力鎖", "cost": 1150, "note": ""}, {"id": 94, "supplier": "鵬驥", "category": "配件", "name": "繼電器", "cost": 50, "note": ""}, {"id": 95, "supplier": "鵬驥", "category": "門鎖", "name": "陽極鎖", "cost": 900, "note": ""}, {"id": 96, "supplier": "鵬驥", "category": "配件", "name": "外掛盒64", "cost": 550, "note": ""}, {"id": 97, "supplier": "鵬驥", "category": "密碼機", "name": "PP-87N", "cost": 900, "note": ""}, {"id": 98, "supplier": "鵬驥", "category": "密碼機", "name": "PG-105K", "cost": 170, "note": ""}, {"id": 99, "supplier": "鵬驥", "category": "配件", "name": "美規變壓器", "cost": 170, "note": ""}, {"id": 100, "supplier": "鵬驥", "category": "配件", "name": "磁扣", "cost": 50, "note": ""}, {"id": 101, "supplier": "日懋", "category": "感應手感", "name": "壓感 小", "cost": 300, "note": ""}, {"id": 102, "supplier": "日懋", "category": "感應手感", "name": "壓感 中", "cost": 400, "note": ""}, {"id": 103, "supplier": "日懋", "category": "感應手感", "name": "壓感 大", "cost": 500, "note": ""}, {"id": 104, "supplier": "日懋", "category": "感應手感", "name": "磁力鎖", "cost": 1300, "note": ""}, {"id": 105, "supplier": "日懋", "category": "感應手感", "name": "時間控制", "cost": 1500, "note": ""}, {"id": 106, "supplier": "日懋", "category": "感應手感", "name": "內推感應", "cost": 600, "note": ""}, {"id": 107, "supplier": "日懋", "category": "感應手感", "name": "外拉感應", "cost": 400, "note": ""}, {"id": 108, "supplier": "日懋", "category": "遙控器", "name": "SR-160", "cost": 1000, "note": ""}, {"id": 109, "supplier": "日懋", "category": "遙控器", "name": "手感線", "cost": 50, "note": ""}, {"id": 110, "supplier": "賀多龍", "category": "自動門主機", "name": "75DC", "cost": 3600, "note": ""}, {"id": 111, "supplier": "賀多龍", "category": "配件", "name": "輪子", "cost": 150, "note": ""}, {"id": 112, "supplier": "賀多龍", "category": "配件", "name": "圓溝輪", "cost": 140, "note": ""}, {"id": 113, "supplier": "賀多龍", "category": "配件", "name": "軸承", "cost": 50, "note": ""}, {"id": 114, "supplier": "賀多龍", "category": "配件", "name": "黑色輪子", "cost": 160, "note": ""}, {"id": 115, "supplier": "上格", "category": "軌道", "name": "一米", "cost": 800, "note": ""}, {"id": 116, "supplier": "上格", "category": "軌道", "name": "底一米", "cost": 600, "note": ""}, {"id": 117, "supplier": "上格", "category": "軌道", "name": "蓋一米", "cost": 200, "note": ""}, {"id": 118, "supplier": "九龍", "category": "防火門", "name": "黃冠防火門弓", "cost": 12500, "note": ""}, {"id": 119, "supplier": "九龍", "category": "防火門", "name": "防火門弓 4號", "cost": 1000, "note": ""}, {"id": 120, "supplier": "九龍", "category": "防火門", "name": "防火門弓 5號", "cost": 1200, "note": ""}, {"id": 121, "supplier": "九龍", "category": "空氣門", "name": "空氣門 一般", "cost": 5200, "note": ""}, {"id": 122, "supplier": "九龍", "category": "空氣門", "name": "空氣門 重型", "cost": 5700, "note": ""}, {"id": 123, "supplier": "九龍", "category": "空氣門", "name": "空氣門 連動 一米", "cost": 900, "note": ""}, {"id": 124, "supplier": "九龍", "category": "空氣門", "name": "90度空氣門", "cost": 18500, "note": ""}, {"id": 125, "supplier": "九龍", "category": "手拉門", "name": "手拉門軌 一米", "cost": 1600, "note": ""}, {"id": 126, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 210cm", "cost": 25000, "note": "125kg"}, {"id": 127, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 250cm", "cost": 28000, "note": ""}, {"id": 128, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 300cm", "cost": 33000, "note": ""}, {"id": 129, "supplier": "議晨", "category": "磁浮門", "name": "磁浮門 90度", "cost": 18500, "note": ""}, {"id": 130, "supplier": "議晨", "category": "磁浮門", "name": "黑色90度磁浮門", "cost": 25000, "note": ""}, {"id": 131, "supplier": "議晨", "category": "磁浮門", "name": "陽極鎖", "cost": 1800, "note": ""}, {"id": 132, "supplier": "議晨", "category": "磁浮門", "name": "外掛盒", "cost": 980, "note": ""}, {"id": 133, "supplier": "議晨", "category": "磁浮門", "name": "遙控器", "cost": 1920, "note": ""}, {"id": 134, "supplier": "議晨", "category": "磁浮門", "name": "遙控發射 白色", "cost": 480, "note": ""}, {"id": 135, "supplier": "議晨", "category": "磁浮門", "name": "遙控器 單顆", "cost": 250, "note": ""}],
   };
 }
 function saveState() { localStorage.setItem('gaoduo_state', JSON.stringify(state)); }
@@ -1083,6 +1117,7 @@ function logout() {
 function initAdmin() {
   updateAdmClock();
   setInterval(updateAdmClock,1000);
+  initFinance();
   const m = new Date().toISOString().slice(0,7);
   document.getElementById('att-month').value=m;
   document.getElementById('sal-month').value=m;
@@ -1095,7 +1130,7 @@ function updateAdmClock() {
   const d=document.getElementById('adm-clock-date'); if(d) d.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
   const ad=document.getElementById('adm-date'); if(ad) ad.textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
 }
-const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],leaves:['請假','管理'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],customers:['聯絡人','名單'],costs:['成本','查詢'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
+const admTitles={dashboard:['系統','總覽'],attendance:['打卡','出勤記錄'],salary:['薪資','計算'],leaves:['請假','管理'],orders:['案件','管理'],bonus:['業務','獎金總覽'],staff:['人員','設定'],customers:['聯絡人','名單'],costs:['成本','查詢'],finance:['財務','報表'],quotes:['報價','單管理'],invoices:['請款','單管理'],receivables:['應收','帳款']};
 function admGoTo(page,el) {
   document.querySelectorAll('.adm-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.remove('active'));
@@ -1107,7 +1142,8 @@ function admGoTo(page,el) {
 }
 function admRenderAll() {
   state=loadState();
-  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); renderQuotes(); renderInvoices(); renderReceivables(); admRenderLeaves(); renderCustomers(); refreshCustomerDropdowns(); renderCosts();
+  initFinance();
+  admRenderDropdowns(); admRenderStaff(); admRenderAtt(); admRenderOrders(); admRenderDashboard(); admRenderBonusOverview(); admRenderSalaryHistory(); admRenderLeaves(); renderCustomers(); refreshCustomerDropdowns(); renderCosts();
 }
 function admRenderDropdowns() {
   ['punch-staff','sal-staff','ord-sales'].forEach(id=>{
@@ -1685,554 +1721,6 @@ function renderEmpBonus(){
     </div>`).join(''):'<div class="emp-empty"><div class="emp-empty-icon">🎯</div>本月尚無成交案件</div>';
 }
 
-// ==================== QUOTES ====================
-let nextQuoteId=1, nextInvoiceId=1, nextRecId=1;
-
-function genNextNo(prefix){
-  const now=new Date();
-  const yy=String(now.getFullYear()).slice(2);
-  const mm=String(now.getMonth()+1).padStart(2,'0');
-  const yearMonth=yy+mm;
-  // Find max serial for this year+month
-  const existing = prefix==='Q' ? state.quotes : state.invoices;
-  const pattern = new RegExp('^'+prefix+yearMonth+'(\\d+)$');
-  let maxSeq=0;
-  existing.forEach(d=>{
-    const m=d.no?.match(pattern);
-    if(m) maxSeq=Math.max(maxSeq,parseInt(m[1]));
-  });
-  return prefix+yearMonth+String(maxSeq+1).padStart(3,'0');
-}
-function showAddQuote(){
-  document.getElementById('q-edit-id').value='';
-  document.getElementById('q-no').value=genNextNo('Q');
-  document.getElementById('q-date').value=new Date().toISOString().slice(0,10);
-  ['q-contact','q-phone','q-taxid','q-addr'].forEach(id=>document.getElementById(id).value='');
-  refreshCustomerDropdowns();
-  document.getElementById('q-customer').value='';
-  document.getElementById('q-note1').value='報價單有效期限:60天';
-  document.getElementById('q-note2').value='付款方式:月結30天';
-  document.getElementById('q-items-container').innerHTML='';
-  addDocItem('q'); addDocItem('q'); addDocItem('q');
-  document.getElementById('quote-modal-title').textContent='📄 新增報價單';
-  document.getElementById('modal-quote').classList.add('show');
-}
-function showAddInvoice(){
-  document.getElementById('i-edit-id').value='';
-  document.getElementById('i-no').value=genNextNo('P');
-  document.getElementById('i-date').value=new Date().toISOString().slice(0,10);
-  ['i-contact','i-addr','i-taxid','i-bank-no','i-bank-name','i-bank-holder'].forEach(id=>document.getElementById(id).value='');
-  refreshCustomerDropdowns();
-  document.getElementById('i-customer').value='';
-  document.getElementById('i-status').value='pending';
-  document.getElementById('i-items-container').innerHTML='';
-  addDocItem('i'); addDocItem('i'); addDocItem('i');
-  document.getElementById('invoice-modal-title').textContent='💳 新增請款單';
-  document.getElementById('modal-invoice').classList.add('show');
-}
-function addDocItem(prefix){
-  const cont=document.getElementById(prefix+'-items-container');
-  const idx=cont.children.length+1;
-  const div=document.createElement('div');
-  div.className='doc-items-row';
-  div.style.flexWrap='wrap';
-  // Build product options
-  let opts='<option value="">— 選擇品項或手動輸入 —</option>';
-  state.costs.forEach(c=>{ opts+=`<option value="${c.id}">[${c.supplier}] ${c.name}</option>`; });
-  div.innerHTML=`
-    <select class="doc-item-product" style="width:100%;margin-bottom:6px;font-size:12px;flex-basis:100%" onchange="fillDocItem(this)">
-      ${opts}
-    </select>
-    <input type="text" placeholder="${idx}. 說明及規格" style="flex:3">
-    <input type="text" class="qty" placeholder="數量/單位" style="max-width:90px" oninput="calcDocRow(this)">
-    <input type="number" class="price" placeholder="單價" oninput="calcDocRow(this)">
-    <input type="number" class="total" placeholder="合計" readonly>
-    <input type="text" class="note" placeholder="附註" style="max-width:90px">
-    <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
-  cont.appendChild(div);
-}
-function fillDocItem(sel){
-  const costId=parseInt(sel.value);
-  const item=state.costs.find(x=>x.id===costId);
-  if(item){
-    const row=sel.closest('.doc-items-row');
-    row.children[1].value=item.name; // desc
-    // Do NOT fill price (user should set sell price)
-  }
-}
-function calcDocRow(el){
-  const row=el.closest('.doc-items-row');
-  const hasSel=row.children[0]?.tagName==='SELECT';
-  const offset=hasSel?1:0;
-  const qtyRaw=row.children[offset+1]?.value||'';
-  const qtyNum=parseFloat(qtyRaw)||0;
-  const price=parseFloat(row.children[offset+2]?.value)||0;
-  const total=qtyNum*price;
-  if(row.children[offset+3]) row.children[offset+3].value=total||'';
-}
-function getDocItems(prefix){
-  const cont=document.getElementById(prefix+'-items-container');
-  return Array.from(cont.children).map(row=>{
-    // New format: select(0), desc(1), qty(2), price(3), total(4)
-    const hasSel = row.children[0]?.tagName==='SELECT';
-    const offset = hasSel ? 1 : 0;
-    const costId = hasSel ? parseInt(row.children[0].value)||null : null;
-    return {
-      costId,
-      desc:(row.children[offset]?.value||'').trim(),
-      qty:(row.children[offset+1]?.value||'').trim(),
-      price:parseFloat(row.children[offset+2]?.value)||0,
-      total:parseFloat(row.children[offset+3]?.value)||0,
-      note:(row.children[offset+4]?.tagName!=='BUTTON'?row.children[offset+4]?.value||'':''),
-    };
-  }).filter(r=>r.desc||r.total);
-}
-function calcDocTotal(items){
-  const pretax=items.reduce((s,r)=>s+r.total,0);
-  const tax=Math.round(pretax*0.05);
-  return {pretax,tax,total:pretax+tax};
-}
-function saveQuote(){
-  const no=document.getElementById('q-no').value.trim();
-  if(!no){showNotif('請輸入單號',true);return;}
-  const items=getDocItems('q');
-  const {pretax,tax,total}=calcDocTotal(items);
-  const rec={
-    id:document.getElementById('q-edit-id').value||nextQuoteId++,
-    no, date:document.getElementById('q-date').value,
-    contact:document.getElementById('q-contact').value,
-    phone:document.getElementById('q-phone').value,
-    taxid:document.getElementById('q-taxid').value,
-    addr:document.getElementById('q-addr').value,
-    note1:document.getElementById('q-note1').value,
-    note2:document.getElementById('q-note2').value,
-    items,pretax,tax,total,
-  };
-  const idx=state.quotes.findIndex(q=>q.id==rec.id);
-  if(idx>=0) state.quotes[idx]=rec; else state.quotes.push(rec);
-  saveState(); closeModal('modal-quote'); renderQuotes(); showNotif('✅ 報價單已儲存');
-}
-function saveInvoice(){
-  const no=document.getElementById('i-no').value.trim();
-  if(!no){showNotif('請輸入單號',true);return;}
-  const items=getDocItems('i');
-  const {pretax,tax,total}=calcDocTotal(items);
-  const rec={
-    id:document.getElementById('i-edit-id').value||nextInvoiceId++,
-    no, date:document.getElementById('i-date').value,
-    contact:document.getElementById('i-contact').value,
-    addr:document.getElementById('i-addr').value,
-    taxid:document.getElementById('i-taxid').value,
-    status:document.getElementById('i-status').value,
-    bankNo:document.getElementById('i-bank-no').value,
-    bankName:document.getElementById('i-bank-name').value,
-    bankHolder:document.getElementById('i-bank-holder').value,
-    items,pretax,tax,total,
-  };
-  const idx=state.invoices.findIndex(i=>i.id==rec.id);
-  if(idx>=0) state.invoices[idx]=rec; else state.invoices.push(rec);
-  saveState(); closeModal('modal-invoice'); renderInvoices(); showNotif('✅ 請款單已儲存');
-}
-function renderQuotes(){
-  const tb=document.getElementById('quotes-table'); if(!tb) return;
-  if(!state.quotes.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無報價單</td></tr>';return;}
-  tb.innerHTML=[...state.quotes].reverse().map(q=>`<tr>
-    <td class="text-mono text-accent">${q.no}</td>
-    <td>${q.contact}</td>
-    <td>${q.addr||'—'}</td>
-    <td class="text-mono">${fmoney(q.pretax)}</td>
-    <td class="text-mono text-green">${fmoney(q.total)}</td>
-    <td class="text-mono">${q.date}</td>
-    <td><span class="badge badge-amber">有效中</span></td>
-    <td><div class="gap-actions">
-      <button class="btn btn-outline" style="font-size:11px;padding:4px 9px;color:var(--blue);border-color:var(--blue)" onclick="previewDocById('quote',${q.id})">預覽/PDF</button>
-      <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteDoc('quote',${q.id})">刪除</button>
-    </div></td>
-  </tr>`).join('');
-}
-function renderInvoices(){
-  const tb=document.getElementById('invoices-table'); if(!tb) return;
-  if(!state.invoices.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#7a8399;padding:20px">尚無請款單</td></tr>';return;}
-  const sm={pending:['badge-amber','待收款'],partial:['badge-blue','部分收款'],paid:['badge-green','已收款']};
-  tb.innerHTML=[...state.invoices].reverse().map(i=>{
-    const [cls,lbl]=sm[i.status]||['badge-amber','待收款'];
-    return `<tr>
-      <td class="text-mono text-accent">${i.no}</td>
-      <td>${i.contact}</td>
-      <td>${i.addr||'—'}</td>
-      <td class="text-mono">${fmoney(i.pretax)}</td>
-      <td class="text-mono text-green">${fmoney(i.total)}</td>
-      <td class="text-mono">${i.date}</td>
-      <td><span class="badge ${cls}">${lbl}</span></td>
-      <td><div class="gap-actions">
-        <button class="btn btn-outline" style="font-size:11px;padding:4px 9px;color:var(--blue);border-color:var(--blue)" onclick="previewDocById('invoice',${i.id})">預覽/PDF</button>
-        <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteDoc('invoice',${i.id})">刪除</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-}
-function deleteDoc(type,id){
-  if(!confirm('確定刪除？')) return;
-  if(type==='quote') state.quotes=state.quotes.filter(q=>q.id!=id);
-  else state.invoices=state.invoices.filter(i=>i.id!=id);
-  saveState(); renderQuotes(); renderInvoices(); showNotif('已刪除');
-}
-
-// ── Preview / Print ──
-function previewDoc(type){
-  const prefix=type==='quote'?'q':'i';
-  const items=getDocItems(prefix);
-  const {pretax,tax,total}=calcDocTotal(items);
-  const doc={
-    no:document.getElementById(prefix+'-no').value,
-    date:document.getElementById(prefix+'-date').value,
-    contact:document.getElementById(prefix+'-contact').value,
-    phone:type==='quote'?document.getElementById('q-phone').value:'',
-    taxid:document.getElementById(prefix+'-taxid').value,
-    addr:document.getElementById(prefix+'-addr').value,
-    note1:type==='quote'?document.getElementById('q-note1').value:'保固期:完工後一年',
-    note2:type==='quote'?document.getElementById('q-note2').value:'',
-    bankNo:type==='invoice'?document.getElementById('i-bank-no').value:'',
-    bankName:type==='invoice'?document.getElementById('i-bank-name').value:'',
-    bankHolder:type==='invoice'?document.getElementById('i-bank-holder').value:'',
-    items,pretax,tax,total,
-  };
-  showDocPreview(type,doc);
-}
-function previewDocById(type,id){
-  const doc=type==='quote'?state.quotes.find(q=>q.id==id):state.invoices.find(i=>i.id==id);
-  if(!doc) return;
-  showDocPreview(type,doc);
-}
-function showDocPreview(type,doc){
-  currentDocData = { type, doc };
-  const title=type==='quote'?'報價單':'請款單';
-  const rowsHtml=doc.items.map((r,i)=>`
-    <tr><td style="text-align:center">${i+1}</td><td>${r.desc}</td><td style="text-align:center">${r.qty||''}</td><td style="text-align:right">${r.price?r.price.toLocaleString():''}</td><td style="text-align:right">${r.total?r.total.toLocaleString():''}</td></tr>
-  `).join('');
-  // Pad to 10 rows
-  const empty=Math.max(0,8-doc.items.length);
-  const emptyRows=Array(empty).fill('<tr><td></td><td></td><td></td><td></td><td></td></tr>').join('');
-
-  const bankSection=type==='invoice'?`<div style="margin-top:20px;font-size:13px;line-height:2">
-    <strong>匯款資訊：</strong><br>
-    帳號：${doc.bankNo||'_______________'}　銀行：${doc.bankName||'_______________'}　戶名：${doc.bankHolder||'_______________'}
-  </div>`:'';
-
-  document.getElementById('doc-preview-content').innerHTML=`
-  <div style="font-family:'Noto Sans TC',sans-serif;padding:24px;color:#111;font-size:13px">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-      <div>
-        <div style="font-size:22px;font-weight:900;color:#111">高鐸工程行</div>
-        <div style="font-size:16px;font-weight:700;margin-top:2px">${title}</div>
-      </div>
-      <div style="text-align:right;font-size:12px;line-height:1.8">
-        <div><strong>NO.</strong>${doc.no}</div>
-      </div>
-    </div>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px">
-      <tr>
-        <td style="width:50%;padding:3px 0"><strong>聯絡人：</strong>${doc.contact||''}</td>
-        <td style="padding:3px 0"><strong>${title==='報價單'?'報價日期':'請款日期'}：</strong>${doc.date||''}</td>
-      </tr>
-      <tr>
-        <td style="padding:3px 0"><strong>${type==='quote'?'聯絡電話：':'施工地址：'}</strong>${type==='quote'?doc.phone:doc.addr}</td>
-        <td style="padding:3px 0"><strong>聯絡電話：</strong>0985-929771</td>
-      </tr>
-      <tr>
-        <td style="padding:3px 0"><strong>統一編號：</strong>${doc.taxid||''}</td>
-        <td style="padding:3px 0"><strong>統一編號：</strong>60965538</td>
-      </tr>
-      ${type==='quote'?`<tr><td style="padding:3px 0"><strong>地址：</strong>${doc.addr||''}</td><td style="padding:3px 0"><strong>地址：</strong>台中市北區崇德路一段121巷2-1號</td></tr>`:''}
-      <tr><td colspan="2" style="padding:3px 0;text-align:right"><strong>幣別：</strong>NTD</td></tr>
-    </table>
-    <table style="width:100%;border-collapse:collapse;border:1px solid #ccc;margin-bottom:12px">
-      <thead>
-        <tr style="background:#f0f0f0">
-          <th style="border:1px solid #ccc;padding:6px;text-align:center;width:5%">項次</th>
-          <th style="border:1px solid #ccc;padding:6px;text-align:left">說明及規格</th>
-          <th style="border:1px solid #ccc;padding:6px;text-align:center;width:10%">數量</th>
-          <th style="border:1px solid #ccc;padding:6px;text-align:right;width:12%">單價</th>
-          <th style="border:1px solid #ccc;padding:6px;text-align:right;width:12%">合計</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}${emptyRows}
-      </tbody>
-    </table>
-    <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:12px;line-height:2;flex:1">
-        <strong>備註：</strong><br>
-        ${doc.note1?'1. '+doc.note1+'<br>':''} 
-        ${doc.note2?'2. '+doc.note2+'<br>':''}
-        ${type==='invoice'?'3. 保固期:完工後一年':'3. 保固期:完工後一年<br>4. 需請水電拉電工自動門使用'}
-      </div>
-      <div style="width:200px;font-size:13px">
-        <table style="width:100%;border-collapse:collapse">
-          <tr><td style="padding:4px 8px;border:1px solid #ccc">合計</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.pretax.toLocaleString()}</td></tr>
-          <tr><td style="padding:4px 8px;border:1px solid #ccc">稅(5%)</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.tax.toLocaleString()}</td></tr>
-          <tr style="background:#f9f9f9;font-weight:700"><td style="padding:4px 8px;border:1px solid #ccc">總計</td><td style="padding:4px 8px;border:1px solid #ccc;text-align:right">${doc.total.toLocaleString()}</td></tr>
-        </table>
-        <div style="margin-top:32px;border-top:1px solid #333;padding-top:4px;text-align:center;font-size:12px">客戶簽章</div>
-      </div>
-    </div>
-    ${bankSection}
-  </div>`;
-  document.getElementById('modal-doc-preview').classList.add('show');
-}
-
-// ── Receivables ──
-function showAddReceivable(){
-  document.getElementById('rec-edit-id').value='';
-  ['rec-date','rec-client','rec-site'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rec-date').value=new Date().toISOString().slice(0,10);
-  ['rec-pretax-val','rec-cost','rec-bonus-lyz','rec-bonus-gwj'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rec-cost-items').innerHTML='';
-  calcRecAuto();
-  document.getElementById('modal-receivable').classList.add('show');
-}
-function addRecCostItem(){
-  const cont=document.getElementById('rec-cost-items');
-  const div=document.createElement('div');
-  div.style.cssText='display:flex;gap:6px;margin-bottom:6px;align-items:center';
-  let opts='<option value="">— 選擇料件 —</option>';
-  state.costs.forEach(c=>{ opts+=`<option value="${c.id}" data-cost="${c.cost}">[${c.supplier}] ${c.name}${c.cost>0?' $'+c.cost.toLocaleString():' 詢價'}</option>`; });
-  div.innerHTML=`<select style="flex:3;font-size:12px" onchange="updateRecCostTotal(this)">${opts}</select>
-    <input type="number" placeholder="數量" style="width:60px;font-size:12px" value="1" oninput="updateRecCostTotal(this)">
-    <input type="number" placeholder="小計" style="width:80px;font-size:12px;opacity:0.7" readonly>
-    <button style="background:transparent;border:none;color:#e05555;cursor:pointer;font-size:16px" onclick="this.parentElement.remove();calcRecAuto()">✕</button>`;
-  cont.appendChild(div);
-}
-function updateRecCostTotal(el){
-  const row=el.closest('div');
-  const sel=row.children[0];
-  const qty=parseFloat(row.children[1].value)||1;
-  const opt=sel.options[sel.selectedIndex];
-  const unitCost=parseFloat(opt?.dataset?.cost)||0;
-  row.children[2].value=unitCost*qty||'';
-  calcRecAuto();
-}
-function calcRecAuto(){
-  const pretax=parseFloat(document.getElementById('rec-pretax-val').value)||0;
-  // Sum cost items
-  let itemsCost=0;
-  document.querySelectorAll('#rec-cost-items > div').forEach(row=>{
-    itemsCost+=parseFloat(row.children[2].value)||0;
-  });
-  // Manual cost override
-  const manualCost=parseFloat(document.getElementById('rec-cost').value)||0;
-  const totalCost=itemsCost+manualCost;
-  const lyz=parseFloat(document.getElementById('rec-bonus-lyz').value)||0;
-  const gwj=parseFloat(document.getElementById('rec-bonus-gwj').value)||0;
-  const tax=Math.round(pretax*0.05);
-  const profit=pretax-(totalCost+lyz+gwj);
-  document.getElementById('rec-auto-tax').textContent=fmoney(tax);
-  document.getElementById('rec-auto-total').textContent=fmoney(pretax+tax);
-  document.getElementById('rec-auto-profit').textContent=fmoney(profit);
-  // Show items cost breakdown
-  const costLabel=document.getElementById('rec-cost');
-  if(costLabel) costLabel.placeholder=itemsCost>0?'料件成本已自動計入（'+fmoney(itemsCost)+'）':'0（其他成本）';
-}
-function saveReceivable(){
-  const client=document.getElementById('rec-client').value.trim();
-  if(!client){showNotif('請輸入客戶名稱',true);return;}
-  const pretax=parseFloat(document.getElementById('rec-pretax-val').value)||0;
-  // Collect cost items
-  const costItems=[];
-  let itemsCost=0;
-  document.querySelectorAll('#rec-cost-items > div').forEach(row=>{
-    const sel=row.children[0];
-    const costId=parseInt(sel.value)||null;
-    const qty=parseFloat(row.children[1].value)||1;
-    const subtotal=parseFloat(row.children[2].value)||0;
-    if(costId){
-      const item=state.costs.find(x=>x.id===costId);
-      costItems.push({costId,name:item?.name||'',qty,subtotal});
-      itemsCost+=subtotal;
-    }
-  });
-  const manualCost=parseFloat(document.getElementById('rec-cost').value)||0;
-  const cost=itemsCost+manualCost;
-  const lyz=parseFloat(document.getElementById('rec-bonus-lyz').value)||0;
-  const gwj=parseFloat(document.getElementById('rec-bonus-gwj').value)||0;
-  const tax=Math.round(pretax*0.05);
-  const rec={
-    id:document.getElementById('rec-edit-id').value||nextRecId++,
-    date:document.getElementById('rec-date').value,
-    client,
-    site:document.getElementById('rec-site').value,
-    pretax,tax,total:pretax+tax,cost,lyz,gwj,costItems,
-    profit:pretax-(cost+lyz+gwj),
-  };
-  const idx=state.receivables.findIndex(r=>r.id==rec.id);
-  if(idx>=0) state.receivables[idx]=rec; else state.receivables.push(rec);
-  saveState(); closeModal('modal-receivable'); renderReceivables(); showNotif('✅ 帳款已儲存');
-}
-function renderReceivables(){
-  state=loadState();
-  const month=document.getElementById('rec-month')?.value||'';
-  const rows=state.receivables.filter(r=>!month||r.date.startsWith(month));
-  const tb=document.getElementById('rec-table'); if(!tb) return;
-  if(!rows.length){tb.innerHTML='<tr><td colspan="11" style="text-align:center;color:#7a8399;padding:20px">尚無帳款記錄</td></tr>';}
-  else tb.innerHTML=rows.map(r=>`<tr>
-    <td class="text-mono">${r.date}</td>
-    <td><strong>${r.client}</strong></td>
-    <td>${r.site||'—'}</td>
-    <td class="text-mono">${fmoney(r.pretax)}</td>
-    <td class="text-mono text-dim">${fmoney(r.tax)}</td>
-    <td class="text-mono text-accent">${fmoney(r.total)}</td>
-    <td class="text-mono">${r.cost?fmoney(r.cost):'—'}</td>
-    <td class="text-mono">${r.lyz?fmoney(r.lyz):'—'}</td>
-    <td class="text-mono">${r.gwj?fmoney(r.gwj):'—'}</td>
-    <td class="text-mono text-green" style="font-weight:700">${fmoney(r.profit)}</td>
-    <td><button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="deleteRec(${r.id})">刪除</button></td>
-  </tr>`).join('');
-  // Summary
-  const sumPretax=rows.reduce((s,r)=>s+r.pretax,0);
-  const sumTotal=rows.reduce((s,r)=>s+r.total,0);
-  const sumProfit=rows.reduce((s,r)=>s+r.profit,0);
-  const p1=document.getElementById('rec-pretax'); if(p1) p1.textContent=fmoney(sumPretax);
-  const p2=document.getElementById('rec-total'); if(p2) p2.textContent=fmoney(sumTotal);
-  const p3=document.getElementById('rec-profit'); if(p3) p3.textContent=fmoney(sumProfit);
-}
-function deleteRec(id){
-  if(!confirm('確定刪除？')) return;
-  state.receivables=state.receivables.filter(r=>r.id!=id);
-  saveState(); renderReceivables();
-}
-
-// ==================== PDF EXPORT ====================
-let currentDocData = null;
-
-function printDoc() {
-  if (!currentDocData) { showNotif('請先預覽文件', true); return; }
-  const { type, doc } = currentDocData;
-  const title = type === 'quote' ? '報價單' : '請款單';
-
-  const rowsHtml = doc.items.map((r, i) => `
-    <tr>
-      <td style="text-align:center;border:1px solid #ccc;padding:5px">${i+1}</td>
-      <td style="border:1px solid #ccc;padding:5px">${r.desc||''}</td>
-      <td style="text-align:center;border:1px solid #ccc;padding:5px">${r.qty||''}</td>
-      <td style="text-align:right;border:1px solid #ccc;padding:5px">${r.price?r.price.toLocaleString('zh-TW'):''}</td>
-      <td style="text-align:right;border:1px solid #ccc;padding:5px">${r.total?r.total.toLocaleString('zh-TW'):''}</td>
-      <td style="border:1px solid #ccc;padding:5px;font-size:11px;color:#555">${r.note||''}</td>
-    </tr>`).join('');
-  const emptyRows = Array(Math.max(0,8-doc.items.length)).fill(`<tr><td style="border:1px solid #ccc;padding:5px;height:26px"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>`).join('');
-
-  const bankSection = type==='invoice' && (doc.bankNo||doc.bankName||doc.bankHolder) ? `
-    <div style="margin-top:16px;font-size:13px;border-top:1px solid #ccc;padding-top:10px">
-      <strong>匯款資訊：</strong>
-      帳號：${doc.bankNo||''}　銀行：${doc.bankName||''}　戶名：${doc.bankHolder||''}
-    </div>` : '';
-
-  const html = `<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<title>${title} ${doc.no||''}</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Noto Sans TC',sans-serif; font-size:13px; color:#111; padding:20px; max-width:800px; margin:0 auto; }
-  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
-  .company-name { font-size:22px; font-weight:900; }
-  .doc-title { font-size:16px; font-weight:700; margin-top:4px; }
-  .doc-no { font-size:13px; text-align:right; }
-  .info-table { width:100%; border-collapse:collapse; margin-bottom:14px; font-size:12px; }
-  .info-table td { padding:3px 4px; vertical-align:top; }
-  .items-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
-  .items-table th { background:#f0f0f0; border:1px solid #ccc; padding:7px 8px; font-size:12px; }
-  .items-table td { border:1px solid #ccc; padding:6px 8px; font-size:12px; }
-  .totals-section { display:flex; justify-content:space-between; align-items:flex-start; }
-  .notes { font-size:12px; line-height:2; flex:1; padding-right:20px; }
-  .totals-table { width:200px; border-collapse:collapse; }
-  .totals-table td { border:1px solid #ccc; padding:5px 8px; font-size:13px; }
-  .totals-table .total-row td { font-weight:700; background:#f9f9f9; }
-  .sig-line { margin-top:32px; border-top:1px solid #333; padding-top:6px; text-align:center; font-size:12px; width:200px; }
-  @media print {
-    body { padding:10px; }
-    button { display:none !important; }
-  }
-</style>
-</head>
-<body>
-<div class="header">
-  <div>
-    <div class="company-name">高鐸工程行</div>
-    <div class="doc-title">${title}</div>
-  </div>
-  <div class="doc-no"><strong>NO. ${doc.no||''}</strong></div>
-</div>
-
-<table class="info-table">
-  <tr>
-    <td width="50%"><strong>聯絡人：</strong>${doc.contact||''}</td>
-    <td><strong>${type==='quote'?'報價日期':'請款日期'}：</strong>${doc.date||''}</td>
-  </tr>
-  <tr>
-    <td><strong>${type==='quote'?'聯絡電話：':'施工地址：'}</strong>${type==='quote'?(doc.phone||''):(doc.addr||'')}</td>
-    <td><strong>聯絡電話：</strong>0985-929771</td>
-  </tr>
-  <tr>
-    <td><strong>統一編號：</strong>${doc.taxid||''}</td>
-    <td><strong>統一編號：</strong>60965538</td>
-  </tr>
-  ${type==='quote'?`<tr><td><strong>地址：</strong>${doc.addr||''}</td><td><strong>地址：</strong>台中市北區崇德路一段121巷2-1號</td></tr>`:''}
-  <tr><td colspan="2" style="text-align:right"><strong>幣別：</strong>NTD</td></tr>
-</table>
-
-<table class="items-table">
-  <thead><tr>
-    <th style="width:5%;text-align:center">項次</th>
-    <th style="text-align:left">說明及規格</th>
-    <th style="width:12%;text-align:center">數量/單位</th>
-    <th style="width:12%;text-align:right">單價</th>
-    <th style="width:12%;text-align:right">合計</th>
-    <th style="width:12%;text-align:left">附註</th>
-  </tr></thead>
-  <tbody>${rowsHtml}${emptyRows}</tbody>
-</table>
-
-<div class="totals-section">
-  <div class="notes">
-    <strong>備註：</strong><br>
-    ${doc.note1?'1. '+doc.note1+'<br>':''}
-    ${doc.note2?'2. '+doc.note2+'<br>':''}
-    3. 保固期:完工後一年<br>
-    ${type==='quote'?'4. 需請水電拉電工自動門使用':''}
-  </div>
-  <div>
-    <table class="totals-table">
-      <tr><td>合計</td><td style="text-align:right">${(doc.pretax||0).toLocaleString('zh-TW')}</td></tr>
-      <tr><td>稅(5%)</td><td style="text-align:right">${(doc.tax||0).toLocaleString('zh-TW')}</td></tr>
-      <tr class="total-row"><td>總計</td><td style="text-align:right">${(doc.total||0).toLocaleString('zh-TW')}</td></tr>
-    </table>
-    <div class="sig-line">客戶簽章</div>
-  </div>
-</div>
-${bankSection}
-
-<script>
-  window.onload = function() {
-    // Auto prompt print on mobile
-    setTimeout(function(){ window.print(); }, 800);
-  }
-<\/script>
-</body></html>`;
-
-  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const w = window.open(url, '_blank');
-  if (!w) {
-    // Fallback: download as html
-    const a = document.createElement('a');
-    a.href = url; a.download = title+'_'+( doc.no||'doc')+'.html';
-    a.click();
-  }
-}
-
 // ==================== CUSTOMER MANAGEMENT ====================
 function showAddCustomer(){
   document.getElementById('cust-edit-id').value='';
@@ -2306,6 +1794,363 @@ function fillDocCustomer(prefix){
     const taxidEl=document.getElementById(prefix+'-taxid'); if(taxidEl) taxidEl.value=cust.taxid||'';
     const addrEl=document.getElementById(prefix+'-addr'); if(addrEl) addrEl.value=cust.addr||'';
   }
+}
+
+
+// ==================== FINANCE MANAGEMENT ====================
+const EXP_CATEGORIES = ['人事薪資','租金','電信費','台電','水電','進貨','其他'];
+const PURCHASE_CATEGORIES = ['自動門主機','感應器','軌道','配件','門鎖','其他'];
+
+let finNextRevId=1, finNextPurId=1, finNextSalId=1, finNextExpId=1;
+
+// ── helpers ──
+function finYears(){
+  const now=new Date().getFullYear();
+  const years=new Set([now,now-1]);
+  const f=state.finance;
+  [...f.revenues,...f.purchases,...f.expenses,...f.salaries].forEach(r=>{
+    if(r.date) years.add(parseInt(r.date.slice(0,4)));
+    if(r.month) years.add(parseInt(r.month.slice(0,4)));
+  });
+  return [...years].sort((a,b)=>b-a);
+}
+function initYearSelect(id, defaultYear){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML=finYears().map(y=>`<option value="${y}">${y}年</option>`).join('');
+  el.value=cur||defaultYear||new Date().getFullYear();
+}
+function fmFmt(n){ return '$'+(Math.round(n||0)).toLocaleString('zh-TW'); }
+function growthLabel(prev,cur){
+  if(!prev||prev===0) return cur>0?'+100%':'—';
+  const g=((cur-prev)/prev*100);
+  const sign=g>=0?'+':'';
+  return `<span style="color:${g>=0?'#4a8c5c':'#c0392b'};font-weight:700">${sign}${g.toFixed(1)}%</span>`;
+}
+
+// ── Tab switching ──
+function finTab(tab){
+  ['overview','revenue','purchase','salary','expense','report'].forEach(t=>{
+    const el=document.getElementById('fin-'+t); if(el) el.classList.toggle('hidden',t!==tab);
+    const btn=document.getElementById('ftab-'+t); if(btn) btn.classList.toggle('active',t===tab);
+  });
+  if(tab==='overview') renderFinOverview();
+  if(tab==='revenue') renderRevenue();
+  if(tab==='purchase') renderPurchase();
+  if(tab==='salary') renderFinSalary();
+  if(tab==='expense') renderExpense();
+  if(tab==='report') renderReport();
+}
+
+// ── OVERVIEW ──
+function renderFinOverview(){
+  state=loadState();
+  initYearSelect('ov-year');
+  const year=document.getElementById('ov-year')?.value||new Date().getFullYear();
+  const month=document.getElementById('ov-month')?.value||'';
+  const prefix=month?`${year}-${month}`:`${year}`;
+
+  // Aggregate by month
+  const months=['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const monthData=months.map(m=>{
+    const ym=`${year}-${m}`;
+    const rev=state.finance.revenues.filter(r=>r.date?.startsWith(ym)).reduce((s,r)=>s+r.amount,0);
+    const pur=state.finance.purchases.filter(r=>r.date?.startsWith(ym)).reduce((s,r)=>s+r.amount,0);
+    const exp=state.finance.expenses.filter(r=>r.month===ym).reduce((s,r)=>s+r.amount,0);
+    const sal=state.finance.salaries.filter(r=>r.month===ym).reduce((s,r)=>s+(r.salary||0)+(r.bonus||0),0);
+    const totalExp=pur+exp+sal;
+    const profit=rev-totalExp;
+    return {m,ym,rev,pur,exp,sal,totalExp,profit};
+  });
+
+  const filtered = month ? monthData.filter(d=>d.m===month) : monthData;
+  const totalRev=filtered.reduce((s,d)=>s+d.rev,0);
+  const totalExp=filtered.reduce((s,d)=>s+d.totalExp,0);
+  const totalProfit=filtered.reduce((s,d)=>s+d.profit,0);
+  const totalPur=filtered.reduce((s,d)=>s+d.pur,0);
+  const totalSal=filtered.reduce((s,d)=>s+d.sal,0);
+  const monthCount=filtered.filter(d=>d.rev>0).length||1;
+
+  // KPI cards
+  const kpiEl=document.getElementById('ov-kpi-cards');
+  if(kpiEl) kpiEl.innerHTML=`
+    <div class="fin-kpi amber"><div class="fin-kpi-label">總營業額</div><div class="fin-kpi-value">${fmFmt(totalRev)}</div><div class="fin-kpi-sub">平均 ${fmFmt(totalRev/monthCount)}/月</div></div>
+    <div class="fin-kpi ${totalProfit>=0?'positive':'negative'}"><div class="fin-kpi-label">淨利</div><div class="fin-kpi-value">${fmFmt(totalProfit)}</div><div class="fin-kpi-sub">${totalRev>0?(totalProfit/totalRev*100).toFixed(1)+'% 利潤率':'—'}</div></div>
+    <div class="fin-kpi"><div class="fin-kpi-label">總支出</div><div class="fin-kpi-value">${fmFmt(totalExp)}</div><div class="fin-kpi-sub">人事 ${fmFmt(totalSal)} ／ 進貨 ${fmFmt(totalPur)}</div></div>`;
+
+  // Cost ratio
+  const ratioEl=document.getElementById('ov-cost-ratio');
+  if(ratioEl && totalRev>0){
+    const purRatio=totalPur/totalRev*100;
+    const salRatio=totalSal/totalRev*100;
+    const expRatio=(totalExp-totalPur-totalSal)/totalRev*100;
+    ratioEl.innerHTML=`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#b89a78">進貨佔比</span><span style="font-weight:600;color:#5c4a35">${purRatio.toFixed(1)}%</span></div>
+        <div class="fin-bar-wrap"><div class="fin-bar" style="width:${Math.min(purRatio,100)}%;background:#c17a3a"></div></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#b89a78">人事佔比</span><span style="font-weight:600;color:#5c4a35">${salRatio.toFixed(1)}%</span></div>
+        <div class="fin-bar-wrap"><div class="fin-bar" style="width:${Math.min(salRatio,100)}%;background:#8b6e4e"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#b89a78">其他支出佔比</span><span style="font-weight:600;color:#5c4a35">${expRatio.toFixed(1)}%</span></div>
+        <div class="fin-bar-wrap"><div class="fin-bar" style="width:${Math.min(expRatio,100)}%;background:#d4a574"></div></div>
+      </div>`;
+  } else if(ratioEl){ ratioEl.innerHTML='<div style="color:#b89a78;font-size:13px;padding:16px 0;text-align:center">尚無資料</div>'; }
+
+  // Alerts
+  const alertEl=document.getElementById('ov-alerts');
+  if(alertEl){
+    const purRatio=totalRev>0?totalPur/totalRev*100:0;
+    const salRatio=totalRev>0?totalSal/totalRev*100:0;
+    const profitRatio=totalRev>0?totalProfit/totalRev*100:0;
+    const alerts=[];
+    if(profitRatio>=20) alerts.push({cls:'good',icon:'✅',msg:`利潤率 ${profitRatio.toFixed(1)}%，營運狀況優良`});
+    else if(profitRatio>=5) alerts.push({cls:'ok',icon:'⚠️',msg:`利潤率 ${profitRatio.toFixed(1)}%，尚可，可優化支出`});
+    else if(totalRev>0) alerts.push({cls:'bad',icon:'🚨',msg:`利潤率 ${profitRatio.toFixed(1)}%，欠佳，請檢視支出`});
+    if(purRatio>50) alerts.push({cls:'bad',icon:'📦',msg:`進貨佔比 ${purRatio.toFixed(1)}% 偏高`});
+    else if(purRatio>35) alerts.push({cls:'ok',icon:'📦',msg:`進貨佔比 ${purRatio.toFixed(1)}%，尚可`});
+    else if(purRatio>0) alerts.push({cls:'good',icon:'📦',msg:`進貨佔比 ${purRatio.toFixed(1)}%，良好`});
+    if(salRatio>40) alerts.push({cls:'bad',icon:'👥',msg:`人事佔比 ${salRatio.toFixed(1)}% 偏高`});
+    else if(salRatio>25) alerts.push({cls:'ok',icon:'👥',msg:`人事佔比 ${salRatio.toFixed(1)}%，尚可`});
+    else if(salRatio>0) alerts.push({cls:'good',icon:'👥',msg:`人事佔比 ${salRatio.toFixed(1)}%，良好`});
+    if(!alerts.length) alerts.push({cls:'ok',icon:'💡',msg:'請先新增營業額資料'});
+    alertEl.innerHTML=alerts.map(a=>`<div class="fin-alert ${a.cls}">${a.icon} ${a.msg}</div>`).join('');
+  }
+
+  // Monthly table
+  const tb=document.getElementById('ov-monthly-table');
+  if(tb){
+    const rows=month?filtered:[...monthData];
+    tb.innerHTML=rows.map((d,i)=>{
+      const prevRev=i>0?monthData[i-1].rev:0;
+      const growth=i>0&&prevRev>0?growthLabel(prevRev,d.rev):'—';
+      return `<tr>
+        <td>${d.ym}</td>
+        <td class="text-mono" style="color:#c17a3a">${d.rev?fmFmt(d.rev):'—'}</td>
+        <td class="text-mono">${d.exp+d.pur?fmFmt(d.exp+d.pur):'—'}</td>
+        <td class="text-mono">${d.sal?fmFmt(d.sal):'—'}</td>
+        <td class="text-mono">${d.pur?fmFmt(d.pur):'—'}</td>
+        <td class="text-mono" style="color:${d.profit>=0?'#4a8c5c':'#c0392b'};font-weight:700">${d.rev||d.totalExp?fmFmt(d.profit):'—'}</td>
+        <td>${growth}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ── REVENUE ──
+function renderRevenue(){
+  state=loadState();
+  initYearSelect('rev-year');
+  const year=document.getElementById('rev-year')?.value;
+  const month=document.getElementById('rev-month')?.value||'';
+  const filtered=state.finance.revenues.filter(r=>{
+    if(!r.date) return false;
+    if(year && !r.date.startsWith(year)) return false;
+    if(month && !r.date.startsWith(`${year}-${month}`)) return false;
+    return true;
+  }).sort((a,b)=>b.date.localeCompare(a.date));
+  const total=filtered.reduce((s,r)=>s+r.amount,0);
+  const sumEl=document.getElementById('rev-summary');
+  if(sumEl) sumEl.innerHTML=`
+    <div class="fin-kpi amber"><div class="fin-kpi-label">篩選期間營業額</div><div class="fin-kpi-value">${fmFmt(total)}</div><div class="fin-kpi-sub">${filtered.length} 筆記錄</div></div>
+    <div class="fin-kpi"><div class="fin-kpi-label">平均每筆</div><div class="fin-kpi-value">${filtered.length?fmFmt(total/filtered.length):'—'}</div></div>`;
+  const tb=document.getElementById('rev-table');
+  if(tb) tb.innerHTML=filtered.length?filtered.map(r=>`<tr>
+    <td class="text-mono" style="color:#c17a3a;font-size:11px">${r.no||'—'}</td>
+    <td class="text-mono">${r.date}</td>
+    <td>${r.desc||'—'}</td>
+    <td class="text-mono" style="font-weight:700">${fmFmt(r.amount)}</td>
+    <td><button class="fin-btn-primary" style="background:transparent;color:#c0392b;border:1px solid #f5c0bb;padding:3px 9px;font-size:11px" onclick="deleteFinRec('revenues',${r.id})">刪除</button></td>
+  </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#b89a78;padding:24px">尚無記錄</td></tr>';
+}
+function showAddRevenue(){
+  const no=prompt('單號（選填，如 Q260401）：','');
+  const date=prompt('日期（YYYY-MM-DD）：',new Date().toISOString().slice(0,10));
+  if(!date) return;
+  const desc=prompt('說明：','');
+  const amtStr=prompt('金額（元）：','');
+  const amount=parseFloat(amtStr)||0;
+  if(!amount){showNotif('請輸入有效金額',true);return;}
+  state.finance.revenues.push({id:finNextRevId++,no,date,desc,amount});
+  saveState(); renderRevenue(); renderFinOverview(); showNotif('✅ 營業記錄已新增');
+}
+
+// ── PURCHASE ──
+function renderPurchase(){
+  state=loadState();
+  initYearSelect('pur-year');
+  const year=document.getElementById('pur-year')?.value;
+  const month=document.getElementById('pur-month')?.value||'';
+  const filtered=state.finance.purchases.filter(r=>{
+    if(!r.date) return false;
+    if(year && !r.date.startsWith(year)) return false;
+    if(month && !r.date.startsWith(`${year}-${month}`)) return false;
+    return true;
+  }).sort((a,b)=>b.date.localeCompare(a.date));
+  const total=filtered.reduce((s,r)=>s+r.amount,0);
+  const sumEl=document.getElementById('pur-summary');
+  if(sumEl) sumEl.innerHTML=`
+    <div class="fin-kpi"><div class="fin-kpi-label">進貨總額</div><div class="fin-kpi-value">${fmFmt(total)}</div><div class="fin-kpi-sub">${filtered.length} 筆記錄</div></div>
+    <div class="fin-kpi"><div class="fin-kpi-label">平均每筆</div><div class="fin-kpi-value">${filtered.length?fmFmt(total/filtered.length):'—'}</div></div>`;
+  const tb=document.getElementById('pur-table');
+  if(tb) tb.innerHTML=filtered.length?filtered.map(r=>`<tr>
+    <td class="text-mono">${r.date}</td>
+    <td><span style="background:#fdf0e6;color:#c17a3a;padding:2px 8px;border-radius:6px;font-size:11px">${r.category||'其他'}</span></td>
+    <td>${r.supplier||'—'}</td>
+    <td class="text-mono" style="font-weight:700">${fmFmt(r.amount)}</td>
+    <td><button class="fin-btn-primary" style="background:transparent;color:#c0392b;border:1px solid #f5c0bb;padding:3px 9px;font-size:11px" onclick="deleteFinRec('purchases',${r.id})">刪除</button></td>
+  </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:#b89a78;padding:24px">尚無記錄</td></tr>';
+}
+function showAddPurchase(){
+  const catStr=PURCHASE_CATEGORIES.map((c,i)=>`${i+1}. ${c}`).join('\n');
+  const catIdx=prompt(`選擇項目類別：\n${catStr}\n（輸入數字）`,'');
+  const category=PURCHASE_CATEGORIES[parseInt(catIdx)-1]||prompt('自訂類別：','')||'其他';
+  const date=prompt('日期（YYYY-MM-DD）：',new Date().toISOString().slice(0,10));
+  if(!date) return;
+  const supplier=prompt('廠商（選填）：','');
+  const amtStr=prompt('金額（元）：','');
+  const amount=parseFloat(amtStr)||0;
+  if(!amount){showNotif('請輸入有效金額',true);return;}
+  state.finance.purchases.push({id:finNextPurId++,date,category,supplier,amount});
+  saveState(); renderPurchase(); renderFinOverview(); showNotif('✅ 進貨記錄已新增');
+}
+
+// ── SALARY ──
+function renderFinSalary(){
+  state=loadState();
+  initYearSelect('sal-fin-year');
+  const year=document.getElementById('sal-fin-year')?.value||new Date().getFullYear();
+  const m=document.getElementById('sal-fin-month')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const month=`${year}-${m}`;
+  const records=state.finance.salaries.filter(r=>r.month===month);
+  const tb=document.getElementById('sal-fin-table');
+  if(tb) tb.innerHTML=records.length?records.map(r=>{
+    const sal=r.rateType==='hourly'?(r.rate||0)*(r.hours||0):(r.rate||0)*(r.days||0);
+    const total=sal+(r.bonus||0);
+    return `<tr>
+      <td><strong>${r.name}</strong></td>
+      <td class="text-mono">${fmFmt(r.rate)}/${r.rateType==='hourly'?'時':'日'}</td>
+      <td class="text-mono">${r.rateType==='hourly'?(r.hours||0)+' hr':(r.days||0)+' 天'}</td>
+      <td class="text-mono">${fmFmt(sal)}</td>
+      <td class="text-mono" style="color:#c17a3a">${r.bonus?fmFmt(r.bonus):'—'}</td>
+      <td class="text-mono" style="font-weight:700">${fmFmt(total)}</td>
+      <td><button class="fin-btn-primary" style="background:transparent;color:#c0392b;border:1px solid #f5c0bb;padding:3px 9px;font-size:11px" onclick="deleteFinRec('salaries',${r.id})">刪除</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" style="text-align:center;color:#b89a78;padding:24px">本月尚無人事記錄</td></tr>';
+  const totalBase=records.reduce((s,r)=>s+(r.rateType==='hourly'?(r.rate||0)*(r.hours||0):(r.rate||0)*(r.days||0)),0);
+  const totalBonus=records.reduce((s,r)=>s+(r.bonus||0),0);
+  const el1=document.getElementById('sal-fin-total-base'); if(el1) el1.textContent=fmFmt(totalBase);
+  const el2=document.getElementById('sal-fin-total-bonus'); if(el2) el2.textContent=fmFmt(totalBonus);
+  const el3=document.getElementById('sal-fin-total'); if(el3) el3.textContent=fmFmt(totalBase+totalBonus);
+}
+function showAddSalaryEntry(){
+  const name=prompt('姓名：','');
+  if(!name) return;
+  const typeStr=prompt('薪資類型：\n1. 時薪制\n2. 日薪制','1');
+  const rateType=typeStr==='2'?'daily':'hourly';
+  const rate=parseFloat(prompt(rateType==='hourly'?'時薪（元/小時）：':'日薪（元/天）：',''))||0;
+  const hoursOrDays=parseFloat(prompt(rateType==='hourly'?'工時（小時）：':'工作天數：',''))||0;
+  const bonus=parseFloat(prompt('專案獎金（元，無則填0）：','0'))||0;
+  const year=document.getElementById('sal-fin-year')?.value||new Date().getFullYear();
+  const m=document.getElementById('sal-fin-month')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const month=`${year}-${m}`;
+  const rec={id:finNextSalId++,month,name,rateType,rate};
+  if(rateType==='hourly') rec.hours=hoursOrDays; else rec.days=hoursOrDays;
+  if(bonus) rec.bonus=bonus;
+  state.finance.salaries.push(rec);
+  saveState(); renderFinSalary(); renderFinOverview(); showNotif('✅ 人事記錄已新增');
+}
+
+// ── EXPENSE ──
+function renderExpense(){
+  state=loadState();
+  initYearSelect('exp-year');
+  const year=document.getElementById('exp-year')?.value||new Date().getFullYear();
+  const m=document.getElementById('exp-month')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const month=`${year}-${m}`;
+  const records=state.finance.expenses.filter(r=>r.month===month);
+  const tb=document.getElementById('exp-table');
+  if(tb) tb.innerHTML=records.length?records.map(r=>`<tr>
+    <td><span style="background:#fdf0e6;color:#c17a3a;padding:2px 8px;border-radius:6px;font-size:11px">${r.category}</span></td>
+    <td>${r.desc||'—'}</td>
+    <td class="text-mono" style="font-weight:700">${fmFmt(r.amount)}</td>
+    <td><button class="fin-btn-primary" style="background:transparent;color:#c0392b;border:1px solid #f5c0bb;padding:3px 9px;font-size:11px" onclick="deleteFinRec('expenses',${r.id})">刪除</button></td>
+  </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:#b89a78;padding:24px">本月尚無支出記錄</td></tr>';
+  const total=records.reduce((s,r)=>s+r.amount,0);
+  const el=document.getElementById('exp-total'); if(el) el.textContent=fmFmt(total);
+}
+function showAddExpense(){
+  const catStr=EXP_CATEGORIES.map((c,i)=>`${i+1}. ${c}`).join('\n');
+  const catIdx=prompt(`選擇支出類別：\n${catStr}\n（輸入數字，選7可自訂）`,'');
+  let category=EXP_CATEGORIES[parseInt(catIdx)-1]||'其他';
+  if(category==='其他') category=prompt('自訂類別名稱：','')||'其他';
+  const desc=prompt('說明（選填）：','');
+  const amtStr=prompt('金額（元）：','');
+  const amount=parseFloat(amtStr)||0;
+  if(!amount){showNotif('請輸入有效金額',true);return;}
+  const year=document.getElementById('exp-year')?.value||new Date().getFullYear();
+  const m=document.getElementById('exp-month')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const month=`${year}-${m}`;
+  state.finance.expenses.push({id:finNextExpId++,month,category,desc,amount});
+  saveState(); renderExpense(); renderFinOverview(); showNotif('✅ 支出記錄已新增');
+}
+
+// ── REPORT ──
+function renderReport(){
+  state=loadState();
+  initYearSelect('rpt-year-a');
+  initYearSelect('rpt-year-b');
+  const years=finYears();
+  const yearA=document.getElementById('rpt-year-a')?.value||years[0]||new Date().getFullYear();
+  const yearB=document.getElementById('rpt-year-b')?.value||years[1]||new Date().getFullYear()-1;
+  const la=document.getElementById('rpt-year-a-label'); if(la) la.textContent=yearA+'年 營業額';
+  const lb=document.getElementById('rpt-year-b-label'); if(lb) lb.textContent=yearB+'年 營業額';
+  const months=['01','02','03','04','05','06','07','08','09','10','11','12'];
+  let totalA=0, totalB=0;
+  const tb=document.getElementById('rpt-monthly-compare');
+  if(tb) tb.innerHTML=months.map(m=>{
+    const revA=state.finance.revenues.filter(r=>r.date?.startsWith(`${yearA}-${m}`)).reduce((s,r)=>s+r.amount,0);
+    const revB=state.finance.revenues.filter(r=>r.date?.startsWith(`${yearB}-${m}`)).reduce((s,r)=>s+r.amount,0);
+    totalA+=revA; totalB+=revB;
+    return `<tr>
+      <td>${parseInt(m)}月</td>
+      <td class="text-mono" style="color:#c17a3a">${revA?fmFmt(revA):'—'}</td>
+      <td class="text-mono" style="color:#8b6e4e">${revB?fmFmt(revB):'—'}</td>
+      <td>${growthLabel(revB,revA)}</td>
+    </tr>`;
+  }).join('');
+  const elA=document.getElementById('rpt-total-a'); if(elA) elA.textContent=fmFmt(totalA);
+  const elB=document.getElementById('rpt-total-b'); if(elB) elB.textContent=fmFmt(totalB);
+  const elG=document.getElementById('rpt-total-growth'); if(elG) elG.innerHTML=growthLabel(totalB,totalA);
+  const avgA=totalA/12, avgB=totalB/12;
+  const cardA=document.getElementById('rpt-avg-card-a');
+  if(cardA) cardA.innerHTML=`<div class="fin-card-title">${yearA}年</div><div style="font-size:24px;font-weight:900;font-family:DM Mono,monospace;color:#c17a3a">${fmFmt(totalA)}</div><div style="font-size:12px;color:#b89a78;margin-top:4px">年度總營業額</div><div style="font-size:18px;font-weight:700;font-family:DM Mono,monospace;color:#5c4a35;margin-top:10px">${fmFmt(avgA)}</div><div style="font-size:12px;color:#b89a78">平均月營業額</div>`;
+  const cardB=document.getElementById('rpt-avg-card-b');
+  if(cardB) cardB.innerHTML=`<div class="fin-card-title">${yearB}年</div><div style="font-size:24px;font-weight:900;font-family:DM Mono,monospace;color:#8b6e4e">${fmFmt(totalB)}</div><div style="font-size:12px;color:#b89a78;margin-top:4px">年度總營業額</div><div style="font-size:18px;font-weight:700;font-family:DM Mono,monospace;color:#5c4a35;margin-top:10px">${fmFmt(avgB)}</div><div style="font-size:12px;color:#b89a78">平均月營業額</div>`;
+}
+
+// ── Delete ──
+function deleteFinRec(type, id){
+  if(!confirm('確定刪除？')) return;
+  state.finance[type]=state.finance[type].filter(r=>r.id!=id);
+  saveState();
+  if(type==='revenues') renderRevenue();
+  else if(type==='purchases') renderPurchase();
+  else if(type==='salaries') renderFinSalary();
+  else if(type==='expenses') renderExpense();
+  renderFinOverview();
+}
+
+// Init finance when page loads
+function initFinance(){
+  if(!state.finance) state.finance={revenues:[],purchases:[],expenses:[],salaries:[]};
+  ['revenues','purchases','expenses','salaries'].forEach(k=>{ if(!state.finance[k]) state.finance[k]=[]; });
+  finNextRevId=Math.max(...state.finance.revenues.map(r=>r.id||0),0)+1;
+  finNextPurId=Math.max(...state.finance.purchases.map(r=>r.id||0),0)+1;
+  finNextSalId=Math.max(...state.finance.salaries.map(r=>r.id||0),0)+1;
+  finNextExpId=Math.max(...state.finance.expenses.map(r=>r.id||0),0)+1;
 }
 
 // ==================== COST MANAGEMENT ====================
